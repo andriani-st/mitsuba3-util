@@ -18,11 +18,12 @@ objects = []
 
 def load_sensor(r, phi, theta):
     center = find_center_of_bounding_box()[0]
+    
     return mitsuba.load_dict({
         'type': 'perspective',
         'fov': 45,
         #'to_world': T.look_at(origin=[math.cos(math.radians(phi)), r, math.sin(math.radians(phi))], target=[0,0,0], up=[0, r, 0]),
-        'to_world': T.look_at(origin=[center[0], center[1]-20, center[2]+10], target=center, up=[0, 0, r]),
+        'to_world': T.look_at(origin=[math.cos(math.radians(phi)), r, math.sin(math.radians(phi))], target=center, up=[0, r, 0]),
         'sampler': {
             'type': 'multijitter',
             'sample_count': 16
@@ -121,7 +122,7 @@ def find_center_of_bounding_box():
     return center, [size_x, size_y, size_z]
 
 def create_image(scene):
-  sensor = load_sensor(0.1, 270, 160)
+  sensor = load_sensor(10, 1, 160)
   mitsuba_image = mitsuba.render(scene, spp=16, sensor=sensor)
 
   mitsuba.util.write_bitmap("result.png", mitsuba_image)
