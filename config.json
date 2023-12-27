@@ -1,0 +1,47 @@
+{
+  "output": {
+  "type": "video",
+  "rotation_deg": 180,
+  "rotation_step": 1
+},
+"camera": {
+  "fov": 45,
+  "film_width": 900,
+  "film_height": 900,
+  "target": "auto"
+},
+"objects": [
+  {
+      "name": "glass_cylinder",
+      "filename": "cylinder.obj",
+      "material": {
+         "type": "glass"
+      }
+      
+  },
+  {
+      "name": "floor",
+      "filename": "cylinder.obj",
+      "type": "rectangle",
+      "material": {
+        "type": "diffuse"
+      }
+  }
+],
+"lights": [
+  {
+      "name":"sphere_light1",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": [-3, -3, 1],
+      "radiance": [28.387, 23.9873, 26.75357]
+  },
+  {
+      "name":"sphere_light2",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": [3, 3, 1],
+      "radiance": [28.387, 23.9873, 26.75357]
+  }
+]
+}
