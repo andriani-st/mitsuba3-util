@@ -15,16 +15,8 @@
       "name": "glass_cylinder",
       "filename": "cylinder.obj",
       "material": {
-         "type": "glass"
-      }
-      
-  },
-  {
-      "name": "floor",
-      "filename": "cylinder.obj",
-      "type": "rectangle",
-      "material": {
-        "type": "diffuse"
+         "type": "roughplastic",
+         "alpha": 0.5
       }
   }
 ],

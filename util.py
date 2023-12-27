@@ -14,16 +14,15 @@ mitsuba.set_variant("scalar_rgb")
 from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T
 
+objects = []
+
 def load_sensor(r, phi, theta):
-    # Apply two rotations to convert from spherical coordinates to world 3D coordinates.
-    origin = T.rotate([0, 0, 1], phi).rotate([0, 1, 0], theta) @ mitsuba.ScalarPoint3f([0, 0, r])
-    print("-----------------------------------")
-    #print(origin)
-    #print([0, math.sin(math.radians(phi)), math.cos(math.radians(phi))])
+    center = find_center_of_bounding_box()[0]
     return mitsuba.load_dict({
         'type': 'perspective',
-        'fov': 20,
-        'to_world': T.look_at(origin=[math.cos(math.radians(phi)), 0.4, math.sin(math.radians(phi))], target=[0,0,0], up=[0, r, 0]),
+        'fov': 45,
+        #'to_world': T.look_at(origin=[math.cos(math.radians(phi)), r, math.sin(math.radians(phi))], target=[0,0,0], up=[0, r, 0]),
+        'to_world': T.look_at(origin=[center[0], center[1]-20, center[2]+10], target=center, up=[0, 0, r]),
         'sampler': {
             'type': 'multijitter',
             'sample_count': 16
@@ -44,31 +43,13 @@ def load_scene(filename, radiance):
     center = find_center_of_bounding_box()[0]
     sizes = find_center_of_bounding_box()[1]
     print(sizes)
-    return mitsuba.load_dict({
+    scene_dict = {
         'type': 'scene',
         'id': 'my_scene',
         'integrator': {
             'type': 'path'
         },
-        'glass': {
-            'type': 'obj',
-            'filename': filename,
-            'to_world': T.rotate([0,1,0],70).translate(-center),
-            #'bsdf': {
-            #    'type': 'diffuse',
-            #    'reflectance': {
-            #        'type': 'rgb',
-            #        'value': [0.8, 0.25, 0.3]
-            #    }
-            #}
-            'bsdf': {
-                'type': 'dielectric',
-                #'distribution': 'beckmann',
-                #'alpha': 0.1,
-                'int_ior': 'bk7',
-                'ext_ior': 'air'
-            }
-        },
+        '''
         'sphere_1': {
             'type': 'sphere',
             'center': [-sizes[0], -sizes[1]/2+0.03, sizes[2]],
@@ -88,25 +69,7 @@ def load_scene(filename, radiance):
                 }
             }
         },
-        'sphere_2': {
-            'type': 'sphere',
-            'center': [sizes[0], -sizes[1]/2+0.03, sizes[2]],
-            'radius': 0.03,
-            'bsdf': {
-                'type': 'diffuse',
-                'reflectance': {
-                    'type': 'rgb',
-                    'value': [1, 0, 0]
-                }
-            },
-            'emitter': {
-                'type': 'area',
-                'radiance': {
-                    'type': 'rgb',
-                    'value': radiance,
-                }
-            }
-        },
+        
         'floor': {
             'type': 'rectangle',
             'to_world': T.translate([0,-0.05,0.05]).rotate([1,0,0],-90),
@@ -118,34 +81,34 @@ def load_scene(filename, radiance):
                 }
             }
         },
-        #'light2': {
-        #    'type': 'constant',
-        #    'radiance': {
-        #       'type': 'rgb',
-        #        'value': 1,
-        #    }
-        #}
-    })
+        '''
+        'light2': {
+            'type': 'constant',
+            'radiance': {
+               'type': 'rgb',
+                'value': 1,
+            }
+        }
+    }
+
+    for obj in objects:
+      scene_dict[obj.name] = {'type': 'obj', 'filename': obj.filename, 'bsdf': obj.material}
+
+    return mitsuba.load_dict(scene_dict)
 
 def find_center_of_bounding_box():
-    scene = mitsuba.load_dict({
+    scene_dict = {
         'type': 'scene',
         'id': 'my_scene',
         'integrator': {
             'type': 'path'
-        },
-        'object': {
-            'type': 'obj',
-            'filename': 'frames/frame20.obj',
-            'bsdf': {
-                'type': 'diffuse',
-                'reflectance': {
-                    'type': 'rgb',
-                    'value': [0.2, 0.25, 0.7]
-                }
-            }
         }
-    })
+    }
+
+    for obj in objects:
+      scene_dict[obj.name] = {'type': 'obj', 'filename': obj.filename, 'bsdf': obj.material}
+
+    scene = mitsuba.load_dict(scene_dict)
 
     bbox = scene.bbox()
 
@@ -156,6 +119,12 @@ def find_center_of_bounding_box():
     size_z = bbox.max.z - bbox.min.z
 
     return center, [size_x, size_y, size_z]
+
+def create_image(scene):
+  sensor = load_sensor(0.1, 270, 160)
+  mitsuba_image = mitsuba.render(scene, spp=16, sensor=sensor)
+
+  mitsuba.util.write_bitmap("result.png", mitsuba_image)
 
 def create_rotation_video(scene, num_views):
     for view_index in range(num_views):
@@ -209,11 +178,11 @@ def create_animation_rotation_video(num_views):
 
     video.release()
 
-def jsonReader():
+
+def json_reader():
   f = open('config.json')
   data = json.load(f)
   
-  objects = []
   for obj_data in data['objects']:
     obj = Object(obj_data) 
     objects.append(obj)
@@ -229,7 +198,9 @@ def main():
     #num_views = 360
     #create_rotation_video(scene, num_views)
     #create_animation_rotation_video(num_views)
-    jsonReader()
+    json_reader()
+    scene = load_scene('cylinder.obj',100)
+    create_image(scene)
     
     
 
