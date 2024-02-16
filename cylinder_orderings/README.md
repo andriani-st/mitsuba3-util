@@ -42,5 +42,7 @@ Then the glass_cylinders.py script must be executed that takes information autom
 python3 glass_cylinders_bend.py
 ```
 The script adds a base of appropriate size for the object and the final rendered image will look something like the following image:
+
+
 ![image](https://github.com/andriani-st/mitsuba3-util/assets/77795248/b477d1ba-77a2-4a2a-9cf7-cda86a6a9363)
 
