@@ -40,5 +40,6 @@ The python script must then be executed with:
 python3 filigree_room.py config.json 
 ```
 And the rendered image that is created:
+
 ![image](https://github.com/andriani-st/mitsuba3-util/assets/77795248/a6c1571d-637d-4a0d-9cba-e9a4b515c9e2)
 
