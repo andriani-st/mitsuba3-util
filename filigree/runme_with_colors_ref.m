@@ -41,3 +41,4 @@ for i = 1:size(faces, 1)
 end
 
 fclose(fid);
+exit;
