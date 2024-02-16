@@ -1,6 +1,8 @@
 # mitsuba3-util
 
-This util integrates mitsuba3 and provides a number of options to create rendered images or animations of objects. Also, some more specilised applications were created as described in the README files in stained_glass, filigree and cylinder_orderings folders. 
+The purpose of mitsuba3-util is to simplify the use of mitsuba3 for rendering images and extend its output options. 
+
+The util integrates mitsuba3 and provides a number of options to create rendered images or animations of objects. Also, some more specilised applications were created as described in the README files in stained_glass, filigree and cylinder_orderings folders. 
 
 ## Prerequisites
 - Python
