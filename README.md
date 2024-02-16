@@ -100,3 +100,44 @@ A basic configuration file for creating a rotation video of an OBJ file will loo
 
 The above configuration file creates a .avi rotation video. Some selected frames of that video:
 ![image](https://github.com/andriani-st/mitsuba3-util/assets/77795248/a752db2d-b235-4b82-bbf1-ca4382d27a80)
+
+## Creating an animation video
+A basic configuration file for creating an animation video from OBJ frames:
+```
+{
+  "output": {
+    "type": "animation-video",
+    "spp": 1024,
+    "width": 512
+    "height": 512
+},
+"camera": {
+  "fov": 45,
+},
+"add_floor": "false",
+"objects": [
+  {
+      "name": "cube"
+      "frames_folder": "path/to/folder/frames/cube/",
+      "material": "diffuse"
+  },
+  {
+      "name": "bullet"
+      "frames_folder": "path/to/folder/frames/bullet/",
+      "material": "diffuse"
+  }
+],
+"lights": [
+  {
+      "name": "light1",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-center"
+      "radiance": 10
+  }
+]
+}
+```
+
+The above configuration file creates a .avi animation video. Some selected frames of that video:
+![image](https://github.com/andriani-st/mitsuba3-util/assets/77795248/6c30b1b4-8828-48f2-ac09-9f3266667ec9)
