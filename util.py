@@ -17,12 +17,11 @@ from mitsuba import ScalarTransform4f as T
 objects = []
 
 def load_sensor(r, phi, theta):
-    center = find_center_of_bounding_box()[0]
+    center, sizes = find_center_of_bounding_box()
     
     return mitsuba.load_dict({
         'type': 'perspective',
         'fov': 45,
-        #'to_world': T.look_at(origin=[math.cos(math.radians(phi)), r, math.sin(math.radians(phi))], target=[0,0,0], up=[0, r, 0]),
         'to_world': T.look_at(origin=[math.cos(math.radians(phi)), r, math.sin(math.radians(phi))], target=center, up=[0, r, 0]),
         'sampler': {
             'type': 'multijitter',
@@ -131,7 +130,7 @@ def create_rotation_video(scene, num_views):
     for view_index in range(num_views):
         phi = 360.0 / num_views * view_index  # Calculate the azimuthal angle
         theta = 160.0  # You can set the polar angle to a fixed value or vary it as well
-        sensor = load_sensor(5, phi, theta)
+        sensor = load_sensor(10, phi, theta)
         mitsuba_image = mitsuba.render(scene, spp=16, sensor=sensor)
         output_filename = f"views/view_{view_index:03d}.png"
         mitsuba.util.write_bitmap(output_filename, mitsuba_image)
@@ -196,12 +195,13 @@ def main():
     #test_scene()
     #create_animation_video_fixed_angle()
     
-    #num_views = 360
+    num_views = 360
     #create_rotation_video(scene, num_views)
     #create_animation_rotation_video(num_views)
     json_reader()
     scene = load_scene('cylinder.obj',100)
-    create_image(scene)
+    #create_image(scene)
+    create_rotation_video(scene, num_views)
     
     
 

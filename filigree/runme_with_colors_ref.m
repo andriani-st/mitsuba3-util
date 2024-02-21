@@ -17,7 +17,7 @@ Z = zeros(size(X)); % Flat surface; for 3D surface use actual z-values
 vertices = [X(:) Y(:) Z(:)];
 
 % Create the delaunay triangulation
-DT = delaunayTriangulation(vertices(:,1), vertices(:,2));
+DT = delaunayTriangulation(vertices(:,1), vertices(:,2));χη
 
 % Get the connectivity list (triangles)
 faces = DT.ConnectivityList;
