@@ -1,8 +1,8 @@
 format compact
 close all; clear; clc;
 
-I = double(imread('flower.png'));%/255;
-R = double(imread('flower.png'));
+I = double(imread('image.png'));%/255;
+R = double(imread('image.png'));
 
 
 % Get the size of the image
@@ -14,7 +14,7 @@ piecesEdges = [];
 numPoints = size(skeletonPoints,1);
 numOuterSkeletonPoints = size(skeletonPoints,1);
 
-n = 3;
+n = 500;
 distortionFactor = 0;
 x = round(1 + rand([1 n]) * (size(I,2)-2));
 y = round(1 + rand([1 n]) * (size(I,1)-2));

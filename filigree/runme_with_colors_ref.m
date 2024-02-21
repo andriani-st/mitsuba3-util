@@ -1,7 +1,7 @@
 format compact
 close all; clear; clc;
 
-I = double(imread('pattern.jpg'))/255;
+I = double(imread('image.png'))/255;
 grayImg = rgb2gray(I);
 binaryImg = imbinarize(grayImg);
 

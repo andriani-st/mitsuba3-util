@@ -9,16 +9,35 @@ mitsuba.set_variant("scalar_rgb")
 from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T
 
-def load_sensor(r, phi, theta):
+def rotate_camera_origin(angle):
+        theta = np.radians(angle)
+        object_center=[0, 2, 0]
+        origin = np.array([object_center[0],object_center[1],object_center[2]+5])
+        translated_camera_origin = origin - object_center
+
+        R = np.empty([3, 3])
+
+        R = np.array([[np.cos(theta), 0, np.sin(theta)],
+                    [0, 1, 0],
+                    [-np.sin(theta), 0, np.cos(theta)]])
+        
+            
+        rotated_camera_origin = R @ translated_camera_origin
+
+        new_camera_origin = rotated_camera_origin + object_center
+
+        return new_camera_origin
+
+def load_sensor(angle):
     # Apply two rotations to convert from spherical coordinates to world 3D coordinates.
-    origin = T.rotate([0, 0, 1], phi).rotate([0, 1, 0], theta) @ mitsuba.ScalarPoint3f([0, 0, r])
+    #origin = T.rotate([0, 0, 1], phi).rotate([0, 1, 0], theta) @ mitsuba.ScalarPoint3f([0, 0, r])
     print("-----------------------------------")
     #print(origin)
     #print([0, math.sin(math.radians(phi)), math.cos(math.radians(phi))])
     return mitsuba.load_dict({
         'type': 'perspective',
         'fov': 60,
-        'to_world': T.look_at(origin=[math.cos(math.radians(phi)), 0.7, math.sin(math.radians(phi))], target=[0,0.2,0], up=[0, 0.05, 0]),
+        'to_world': T.look_at(origin=rotate_camera_origin(angle), target=[0, 2, 0], up=[0,1,0]),
         'sampler': {
             'type': 'multijitter',
             'sample_count': 1024
@@ -63,7 +82,7 @@ def load_scene(filename, radiance):
         'glass': {
             'type': 'linearcurve',
             #'to_world': T.translate([0, 0.01, 0]).scale([0.05,0.05,0.05]),
-            'filename': 'curves.txt',
+            'filename': 'curves_twist.txt',
             'bsdf': {
                 'type': 'dielectric',
                 'int_ior': 'bk7',
@@ -73,7 +92,7 @@ def load_scene(filename, radiance):
         'floor': {
             'type': 'rectangle',
             #'to_world': T.translate([0,-0.05,0.05]).rotate([1,0,0],90).scale([0.3,0.3,0.3]),
-            'to_world': T.translate([0,0,0.05]).rotate([1,0,0],-90),
+            'to_world': T.translate([0,0,0.05]).rotate([1,0,0],-90).scale([100,100,100]),
             'bsdf': {
                 'type': 'diffuse',
                 'reflectance': {
@@ -140,10 +159,10 @@ def find_center_of_bounding_box():
     return center, [size_x, size_y, size_z]
 
 def create_rotation_video(scene, num_views):
-    for view_index in range(num_views):
+    for view_index in range(1,num_views,20):
         phi = 360.0 / num_views * view_index  # Calculate the azimuthal angle
         theta = 160.0  # You can set the polar angle to a fixed value or vary it as well
-        sensor = load_sensor(0.001, phi, theta)
+        sensor = load_sensor(view_index)
         mitsuba_image = mitsuba.render(scene, spp=1024, sensor=sensor)
         output_filename = f"views/view_{view_index:03d}.png"
         mitsuba.util.write_bitmap(output_filename, mitsuba_image)

@@ -1,39 +1,64 @@
 {
   "output": {
-  "type": "video",
-  "rotation_deg": 180,
-  "rotation_step": 1
-},
-"camera": {
-  "fov": 45,
-  "film_width": 900,
-  "film_height": 900,
-  "target": "auto"
-},
-"objects": [
-  {
-      "name": "glass_cylinder",
-      "filename": "cylinder.obj",
-      "material": {
-         "type": "roughplastic",
-         "alpha": 0.5
-      }
-  }
-],
-"lights": [
-  {
-      "name":"sphere_light1",
-      "emitter_type": "area",
-      "emitter_shape": "sphere",
-      "position": [-3, -3, 1],
-      "radiance": [28.387, 23.9873, 26.75357]
+    "type": "image",
+    "rotation_axis": [0,0,1],
+    "rotation_degrees": 360,
+    "rotation_step":10,
+    "fov": 45,
+    "up_axis": [0,0,1],
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 2000,
+    "add_floor": true,
+    "add_background": true
   },
-  {
-      "name":"sphere_light2",
+  "objects": [
+    {
+      "name": "curves",
+      "filename": "/home/andriani/Documents/Master_thesis/mitsuba3-util/canning/curves_files/curves_twist_1.txt",
+      "type":"linearcurve",
+      "material": {
+        "type": "glass",
+        "color": [0.871, 0.804, 0.961]
+      }
+    },
+    {
+      "name": "curves1",
+      "filename": "/home/andriani/Documents/Master_thesis/mitsuba3-util/filigree/curves_twist_2.txt",
+      "type":"linearcurve",
+      "material": {
+        "type": "glass",
+        "color": [0.631, 0.416, 0.91]
+      }
+    }
+  ],
+  "lights": [
+    {
+      "name": "light2",
       "emitter_type": "area",
       "emitter_shape": "sphere",
-      "position": [3, 3, 1],
-      "radiance": [28.387, 23.9873, 26.75357]
-  }
-]
+      "position": "top-center",
+      "radiance": 100,
+      "distance_from_object": "medium",
+      "size": "small"
+    },
+    {
+      "name": "light4",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-right",
+      "radiance": 100,
+      "distance_from_object": "large",
+      "size": "large"
+    },
+    {
+      "name": "light5",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-left",
+      "radiance": 100,
+      "distance_from_object": "large",
+      "size": "large"
+    }
+  ]
 }

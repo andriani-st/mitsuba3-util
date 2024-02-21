@@ -2,6 +2,9 @@ import numpy as np
 import mpmath
 import math
 
+#f = open("demofile2.txt", "a")
+#.write("Now the file has more content!")
+#f.close()
 
 r1 = 0.07
 r2 = 0.03
@@ -19,6 +22,6 @@ for i in deg:
     print(np.sin(math.radians(i))*R1, 0.0, np.cos(math.radians(i))*R1, r1)
     print(np.sin(math.radians(i))*R2, 0.3, np.cos(math.radians(i))*R2, r2)
     print(np.sin(math.radians(i))*R3, 0.5, np.cos(math.radians(i))*R3, r3)
-    #print(np.sin(math.radians(i))*R4, 0.6, np.cos(math.radians(i))*R4, r4)
+    print(np.sin(math.radians(i))*R4, 0.6, np.cos(math.radians(i))*R4, r4)
     print()
     #print("z=",np.cos(math.radians(36))*R)
