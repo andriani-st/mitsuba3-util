@@ -1,7 +1,7 @@
 format compact
 close all; clear; clc;
 
-I = double(imread('pattern.jpg'))/255;
+I = double(imread('image.png'))/255;
 grayImg = rgb2gray(I);
 binaryImg = imbinarize(grayImg);
 
@@ -17,7 +17,7 @@ Z = zeros(size(X)); % Flat surface; for 3D surface use actual z-values
 vertices = [X(:) Y(:) Z(:)];
 
 % Create the delaunay triangulation
-DT = delaunayTriangulation(vertices(:,1), vertices(:,2));χη
+DT = delaunayTriangulation(vertices(:,1), vertices(:,2));
 
 % Get the connectivity list (triangles)
 faces = DT.ConnectivityList;

@@ -268,7 +268,7 @@ def main():
     sensor = load_sensor(45)
 
     scene = load_scene(light_radiance=10, constant_radiance=0, add_floor=True, add_object=True)
-    image = mitsuba.render(scene, spp=2048, sensor=sensor)
+    image = mitsuba.render(scene, spp=4048, sensor=sensor)
     mitsuba.util.write_bitmap("result" + ".png", image)
     
     

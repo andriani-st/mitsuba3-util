@@ -1,0 +1,71 @@
+{
+  "output": {
+    "type": "animation_video",
+    "rotation_axis": [0,1,0],
+    "rotation_degrees": 360,
+    "rotation_step":10,
+    "fov": 45,
+    "up_axis": [0,1,0],
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 224,
+    "add_floor": true
+  },
+  "objects": [
+    {
+      "name": "curves",
+      "filename": "/home/andriani/Documents/Master_thesis/01_vprocess3d_out/01_cutting/3d_out/material/",
+      "type":"obj",
+      "material": {
+        "type": "metal",
+        "color": [0.996, 0.639, 0.012]
+      }
+    },
+    {
+      "name": "curves1",
+      "filename": "/home/andriani/Documents/Master_thesis/01_vprocess3d_out/01_cutting/3d_out/scene/floor.obj",
+      "type":"obj",
+      "material": {
+        "type": "plastic"
+      }
+    },
+    {
+        "name": "curves2",
+        "filename": "/home/andriani/Documents/Master_thesis/01_vprocess3d_out/01_cutting/3d_out/tool/",
+        "type":"obj",
+        "material": {
+          "type": "glass",
+          "color": [0.631, 0.416, 0.91]
+        }
+      }
+  ],
+  "lights": [
+    {
+      "name": "light2",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-center",
+      "radiance": 100,
+      "distance_from_object": "medium",
+      "size": "small"
+    },
+    {
+      "name": "light4",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-right",
+      "radiance": 200,
+      "distance_from_object": "large",
+      "size": "large"
+    },
+    {
+      "name": "light5",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-left",
+      "radiance": 200,
+      "distance_from_object": "large",
+      "size": "large"
+    }
+  ]
+}
