@@ -4,6 +4,40 @@ The purpose of mitsuba3-util is to simplify the use of mitsuba3 for rendering im
 
 The util integrates mitsuba3 and provides a number of options to create rendered images or animations of objects. Also, some more specilised applications were created as described in the README files in stained_glass, filigree and cylinder_orderings folders. 
 
+## Project structure
+
+```
+├── camera.py
+├── canning
+│   ├── **curves_files**
+│   ├── runme.m
+│   └── Rz.m
+├── collection
+│   ├── frames
+│   ├── glass_collection
+├── config.json
+├── cylinder_orderings
+│   ├── curves_files
+│   ├── generate_control_points.py
+│   └── README.md
+├── envmaps
+├── examples
+├── filigree
+│   ├── config.json
+│   ├── filigree_room.py
+│   ├── flower.png
+│   ├── getFrameInfo.m
+│   ├── IsInImage.m
+│   ├── README.md
+│   ├── runme.m
+│   ├── scaleTile.m
+│   ├── skeleton.obj
+│   ├── tiles
+│   └── voronoizone.m
+├── structure.txt
+└── util.py
+```
+
 ## Prerequisites
 - Python
 - mitsuba3 (https://mitsuba.readthedocs.io/en/latest/)
