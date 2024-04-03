@@ -49,15 +49,43 @@ The util integrates mitsuba3 and provides a number of options to create rendered
 ```
 
 ## Prerequisites
-- Python
+- Python 3.8.0
+
 - mitsuba3 (https://mitsuba.readthedocs.io/en/latest/)
+```
+pip install mitsuba
+```
+
 - OpenCV (https://pypi.org/project/opencv-python/)
+```
+pip install opencv-python
+```
 - MATLAB
 
 ## Running the util
+
 To run the util
+
 ```
 python3 util.py /path/to/json/file/config.json
+```
+
+or
+
+```
+python3 util.py /path/to/folder/containing/multiple/json/files/
+```
+
+For rendering stained_glass in a room:
+```
+cd stained_glass
+python3 stained_glass_room.py
+```
+For stained_glass_room.py to run: skeleton.obj, colors.txt and tiles/ folder (all produced by running the MATLAB script RUNME.m) must be in stained_glass folder.
+
+The quality of the image can be changed by modifying line 413 (spp parameter) of stained_glass_room.py:
+```
+image = mitsuba.render(scene, spp=224, sensor=sensor)
 ```
 
 By modifying the config.json that passes as an argument above, the following outputs are available:
