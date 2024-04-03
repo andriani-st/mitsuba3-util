@@ -8,13 +8,16 @@ import output
 def main():
 
             
-    folder_json_path = "/home/andriani/Documents/Master_thesis/mitsuba3-util/canning/curves_files/json_files/"
+    #folder_json_path = "/home/andriani/Documents/Master_thesis/mitsuba3-util/canning/curves_files/json_files/"
+    folder_json_path = sys.argv[1]
+    if(os.path.isfile(folder_json_path)):
+        json_files = [folder_json_path]
+    else:
+        # List all files in the folder
+        json_files = os.listdir(folder_json_path)
+        json_files = sorted(json_files, key=lambda x: int(''.join(filter(str.isdigit, x))))
 
-    # List all files in the folder
-    json_files = os.listdir(folder_json_path)
-    json_files = sorted(json_files, key=lambda x: int(''.join(filter(str.isdigit, x))))
-
-    for i in range(4,len(json_files)+1):
+    for i in range(1,len(json_files)+1):
         print(json_files[i-1])
 
         config = os.path.join(folder_json_path, json_files[i-1])

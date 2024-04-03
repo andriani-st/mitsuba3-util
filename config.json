@@ -8,27 +8,19 @@
     "up_axis": [0,0,1],
     "width": 512,
     "height": 512,
-    "samples_per_pixel": 2000,
+    "samples_per_pixel": 224,
     "add_floor": true,
-    "add_background": true
+    "add_background": true,
+    "results_folder": ""
   },
   "objects": [
     {
       "name": "curves",
-      "filename": "/home/andriani/Documents/Master_thesis/mitsuba3-util/canning/curves_files/curves_twist_1.txt",
-      "type":"linearcurve",
+      "filename": "obj_files/cylinder.obj",
+      "type":"obj",
       "material": {
         "type": "glass",
         "color": [0.871, 0.804, 0.961]
-      }
-    },
-    {
-      "name": "curves1",
-      "filename": "/home/andriani/Documents/Master_thesis/mitsuba3-util/filigree/curves_twist_2.txt",
-      "type":"linearcurve",
-      "material": {
-        "type": "glass",
-        "color": [0.631, 0.416, 0.91]
       }
     }
   ],
