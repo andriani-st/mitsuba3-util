@@ -20,7 +20,10 @@ def main():
     for i in range(1,len(json_files)+1):
         print(json_files[i-1])
 
-        config = os.path.join(folder_json_path, json_files[i-1])
+        if(os.path.isfile(folder_json_path)):
+            config = json_files[i-1]
+        else:
+            config = os.path.join(folder_json_path, json_files[i-1])
         with open(config, 'r') as file:
             data = json.load(file)
 
