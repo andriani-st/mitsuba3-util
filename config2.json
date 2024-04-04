@@ -28,7 +28,7 @@
     {
       "name": "light2",
       "emitter_type": "envmap",
-      "filename":"envmaps/christmas_photo_studio_4k_resized.hdr"
+      "filename":"christmas_photo_studio_4k_resized.hdr"
     }
   ]
 }
