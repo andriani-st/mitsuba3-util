@@ -9,7 +9,7 @@ from scene import Scene
 from object import Object
 
 
-mitsuba.set_variant("llvm_ad_rgb")
+mitsuba.set_variant("cuda_ad_rgb")
 from mitsuba import ScalarTransform4f as T
 
 class Output:
