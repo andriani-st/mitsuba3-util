@@ -8,7 +8,7 @@
     "up_axis": [0,0,1],
     "width": 512,
     "height": 512,
-    "samples_per_pixel": 224,
+    "samples_per_pixel": 1024,
     "add_floor": true,
     "add_background": true,
     "results_folder": ""

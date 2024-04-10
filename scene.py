@@ -12,7 +12,7 @@ sys.path.append(parent_dir)
 from camera import Camera
 from object import Object
 
-mitsuba.set_variant("scalar_rgb")
+mitsuba.set_variant("llvm_ad_rgb")
 
 from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T

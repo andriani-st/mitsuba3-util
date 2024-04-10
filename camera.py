@@ -1,7 +1,7 @@
 import mitsuba
 import numpy as np
 
-mitsuba.set_variant("scalar_rgb")
+mitsuba.set_variant("llvm_ad_rgb")
 
 from mitsuba import ScalarTransform4f as T
 

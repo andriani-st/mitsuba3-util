@@ -9,7 +9,7 @@ from scene import Scene
 from object import Object
 
 
-mitsuba.set_variant("scalar_rgb")
+mitsuba.set_variant("llvm_ad_rgb")
 from mitsuba import ScalarTransform4f as T
 
 class Output:
@@ -85,8 +85,13 @@ class AnimationVideo(Output):
                 folders.append(os.listdir(object_json['filename']))
                 folders_json.append(object_json)
 
-        for i in range(len(folders[0])):
-            print("Rendering frame " + str(i+1) + " out of " + str(len(folders[0])))
+        if(len(folders) != 0):
+            frames_num = len(folders[0])
+        else:
+            frames_num = 1
+
+        for i in range(frames_num):
+            print("Rendering frame " + str(i+1) + " out of " + str(frames_num))
             objects_tmp = copy.deepcopy(objects)
             for folder_idx in range(len(folders)):
                 folders[folder_idx].sort(key=self.natural_keys) 

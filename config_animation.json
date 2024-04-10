@@ -1,0 +1,71 @@
+{
+  "output": {
+    "type": "animation_video",
+    "rotation_axis": [0,1,0],
+    "rotation_degrees": 360,
+    "rotation_step":10,
+    "fov": 45,
+    "up_axis": [0,1,0],
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 1024,
+    "add_floor": true,
+    "add_background": false,
+    "results_folder": ""
+  },
+  "objects": [
+    {
+      "name": "material",
+      "filename": "animation_files/01_cutting/3d_out/material/",
+      "type":"obj",
+      "material": {
+        "type": "metal"
+      }
+    },
+    {
+      "name": "tool",
+      "filename": "animation_files/01_cutting/3d_out/tool/",
+      "type":"obj",
+      "material": {
+        "type": "roughglass"
+      }
+    },
+    {
+      "name": "scene",
+      "filename": "animation_files/01_cutting/3d_out/scene/floor.obj",
+      "type":"obj",
+      "material": {
+        "type": "plastic"
+      }
+    }
+  ],
+  "lights": [
+    {
+      "name": "light2",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-center",
+      "radiance": 100,
+      "distance_from_object": "large",
+      "size": "small"
+    },
+    {
+      "name": "light4",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-right",
+      "radiance": 100,
+      "distance_from_object": "large",
+      "size": "large"
+    },
+    {
+      "name": "light5",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-left",
+      "radiance": 100,
+      "distance_from_object": "large",
+      "size": "large"
+    }
+  ]
+}
