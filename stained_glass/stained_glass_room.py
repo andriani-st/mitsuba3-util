@@ -2,19 +2,27 @@ import mitsuba
 import numpy as np
 import sys
 import json
-
-mitsuba.set_variant("cuda_ad_rgb")
-
 from matplotlib import pyplot as plt
-from mitsuba import ScalarTransform4f as T
 
 config = sys.argv[1]
 
 with open(config, 'r') as file:
     data = json.load(file)
 
+use_gpu = True
+if('use_gpu' in data):
+    use_gpu = data['use_gpu']
+
+if(use_gpu):
+    mitsuba.set_variant("cuda_ad_rgb")
+else:
+    mitsuba.set_variant("llvm_ad_rgb")
+    
+from mitsuba import ScalarTransform4f as T
+
 output_json = data['output']
 files_json = data['files']
+
 
 tiles_path = files_json["tiles_path"]
 skeleton_path = files_json["skeleton_path"]
