@@ -5,11 +5,12 @@
       "fov": 45,
       "width": 512,
       "height": 512,
-      "samples_per_pixel": 225
+      "samples_per_pixel": 225,
+      "seed": 0
     },
     "files": {
-        "tiles_path": "example_files/3/tiles/",
-        "skeleton_path": "example_files/3/skeleton.obj",
-        "colors_path": "example_files/3/colors.txt"
+        "tiles_path": "example_files/4/tiles/",
+        "skeleton_path": "example_files/4/skeleton.obj",
+        "colors_path": "example_files/4/colors.txt"
     }
 }

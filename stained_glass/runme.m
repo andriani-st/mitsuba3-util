@@ -1,14 +1,15 @@
 format compact
 close all; clear; clc;
 
-I = double(imread('image.png'));%/255;
-R = double(imread('image.png'));
+I = double(imread('image2.jpg'));%/255;
+R = double(imread('image2.jpg'));
 
 
 % Get the size of the image
 [height, width, ~] = size(I);
 
 [skeletonPoints, frameEdges] = getFrameInfo(height, width, 20);
+skeletonPoints = [skeletonPoints(:,2) skeletonPoints(:,1)];
 
 piecesEdges = [];
 numPoints = size(skeletonPoints,1);
