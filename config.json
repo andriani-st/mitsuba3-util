@@ -1,4 +1,5 @@
 {
+  "use_gpu": true,
   "output": {
     "type": "image",
     "rotation_axis": [0,0,1],
@@ -9,6 +10,7 @@
     "width": 512,
     "height": 512,
     "samples_per_pixel": 1024,
+    "seed": 0,
     "add_floor": true,
     "add_background": true,
     "results_folder": ""

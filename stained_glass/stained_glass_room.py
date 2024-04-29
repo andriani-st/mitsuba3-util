@@ -37,7 +37,7 @@ with open(colors_path, 'r') as file:
 print(colors[0])
 n=len(colors)+1
 
-def load_sensor(fov):
+def load_sensor(spp, seed):
     center, sizes = find_center_of_bounding_box()
 
     return mitsuba.load_dict({
@@ -48,7 +48,8 @@ def load_sensor(fov):
         'principal_point_offset_y': 0,
         'sampler': {
             'type': 'multijitter',
-            'sample_count': 16
+            'sample_count': spp,
+            'seed': seed
         },
         'film': {
             'type': 'hdrfilm',
@@ -424,7 +425,7 @@ def find_center_of_bounding_box():
     return center, [size_x, size_y, size_z]
 
 def main():
-    sensor = load_sensor(45)
+    sensor = load_sensor(output_json['samples_per_pixel'], output_json['seed'])
 
     scene = load_scene(light_radiance=10, constant_radiance=0, add_floor=True, add_object=True)
     image = mitsuba.render(scene, spp=output_json['samples_per_pixel'], sensor=sensor)

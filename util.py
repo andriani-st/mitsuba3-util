@@ -3,8 +3,7 @@ import os
 import json
 import cv2 as cv
 import time
-
-import output
+import variables  
 
 def main():
 
@@ -17,7 +16,7 @@ def main():
         json_files = sorted(json_files, key=lambda x: int(''.join(filter(str.isdigit, x))))
 
     for i in range(1,len(json_files)+1):
-        print(json_files[i-1])
+        print("Processing", json_files[i-1])
 
         if(os.path.isfile(folder_json_path)):
             config = json_files[i-1]
@@ -25,6 +24,10 @@ def main():
             config = os.path.join(folder_json_path, json_files[i-1])
         with open(config, 'r') as file:
             data = json.load(file)
+
+        if('use_gpu' in data):
+            variables.use_gpu = data['use_gpu']
+        import output
 
         output_json = data['output']
         

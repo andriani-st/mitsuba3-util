@@ -1,6 +1,3 @@
-import json
-import mitsuba 
-
 class Object:
   def __init__(self, data):
     self.name = data['name']
