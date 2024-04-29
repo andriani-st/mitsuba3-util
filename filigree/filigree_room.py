@@ -1,31 +1,46 @@
 import mitsuba
 import numpy as np
-import math
+import sys
+import json
 
-mitsuba.set_variant("scalar_rgb")
+config = sys.argv[1]
+
+with open(config, 'r') as file:
+    data = json.load(file)
+
+use_gpu = True
+if('use_gpu' in data):
+    use_gpu = data['use_gpu']
+
+if(use_gpu):
+    print("Running with cuda...")
+    mitsuba.set_variant("cuda_ad_rgb")
+else:
+    mitsuba.set_variant("llvm_ad_rgb")
 
 from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T
 
-filigree_path = "/home/andriani/Documents/Master_thesis/filigree/image_surface_smoothing.obj"
+filigree_path = data['filigree_path']
 
 def load_sensor(fov):
     center, sizes = find_center_of_bounding_box()
 
     return mitsuba.load_dict({
         'type': 'perspective',
-        'fov': 45,
-        'to_world': T.look_at(origin=[center[0],center[1]+800,center[2]-max(sizes)-400], target=center, up=[0, 1, 0]),
+        'fov': data['output']['fov'],
+        'to_world': T.look_at(origin=[center[0],center[1]+max(sizes),center[2]-max(sizes)*1.4], target=center, up=[0, 1, 0]),
         'principal_point_offset_x': 0,  #normalized principal point, [0,0] -> center of image
         'principal_point_offset_y': 0,
         'sampler': {
             'type': 'multijitter',
-            'sample_count': 16
+            'sample_count': 16,
+            'seed': data['output']['seed']
         },
         'film': {
             'type': 'hdrfilm',
-            'width': 512,
-            'height': 512,
+            'width': data['output']['width'],
+            'height': data['output']['height'],
             'rfilter': {
                 'type': 'tent',
             },
@@ -268,7 +283,7 @@ def main():
     sensor = load_sensor(45)
 
     scene = load_scene(light_radiance=10, constant_radiance=0, add_floor=True, add_object=True)
-    image = mitsuba.render(scene, spp=4048, sensor=sensor)
+    image = mitsuba.render(scene, spp=data['output']['samples_per_pixel'], sensor=sensor)
     mitsuba.util.write_bitmap("result" + ".png", image)
     
     
