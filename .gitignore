@@ -1,3 +1,6 @@
 envmaps/
 *.hdr
 *.avi
+*.png
+*.pyc
+*.ply

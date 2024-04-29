@@ -1,0 +1,14 @@
+{
+    "output": {
+      "type": "image",
+      "fov": 45,
+      "width": 512,
+      "height": 512,
+      "samples_per_pixel": 225
+    },
+    "files": {
+        "tiles_path": "example_files/2/tiles/",
+        "skeleton_path": "example_files/2/skeleton.obj",
+        "colors_path": "example_files/2/colors.txt"
+    }
+}

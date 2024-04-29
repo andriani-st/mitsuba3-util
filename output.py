@@ -3,14 +3,10 @@ import os
 import json
 import re
 import copy
-import cv2 as cv
 import mitsuba
+
 from scene import Scene
 from object import Object
-
-
-mitsuba.set_variant("llvm_ad_rgb")
-from mitsuba import ScalarTransform4f as T
 
 class Output:
     def __init__(self, config_file, results_folder):

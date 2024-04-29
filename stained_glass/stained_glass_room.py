@@ -1,15 +1,32 @@
 import mitsuba
 import numpy as np
-import math
-
-mitsuba.set_variant("scalar_rgb")
-
+import sys
+import json
 from matplotlib import pyplot as plt
+
+config = sys.argv[1]
+
+with open(config, 'r') as file:
+    data = json.load(file)
+
+use_gpu = True
+if('use_gpu' in data):
+    use_gpu = data['use_gpu']
+
+if(use_gpu):
+    mitsuba.set_variant("cuda_ad_rgb")
+else:
+    mitsuba.set_variant("llvm_ad_rgb")
+    
 from mitsuba import ScalarTransform4f as T
 
-tiles_path = "tiles/"
-skeleton_path = "skeleton.obj"
-colors_path = "colors.txt"
+output_json = data['output']
+files_json = data['files']
+
+
+tiles_path = files_json["tiles_path"]
+skeleton_path = files_json["skeleton_path"]
+colors_path = files_json["colors_path"]
 
 colors = []
 with open(colors_path, 'r') as file:
@@ -20,23 +37,24 @@ with open(colors_path, 'r') as file:
 print(colors[0])
 n=len(colors)+1
 
-def load_sensor(fov):
+def load_sensor(spp, seed):
     center, sizes = find_center_of_bounding_box()
 
     return mitsuba.load_dict({
         'type': 'perspective',
-        'fov': 45,
+        'fov': output_json['fov'],
         'to_world': T.look_at(origin=[center[0],center[1],center[2]-max(sizes)-3500], target=center, up=[0, 1, 0]),
         'principal_point_offset_x': 0,  #normalized principal point, [0,0] -> center of image
         'principal_point_offset_y': 0,
         'sampler': {
             'type': 'multijitter',
-            'sample_count': 16
+            'sample_count': spp,
+            'seed': seed
         },
         'film': {
             'type': 'hdrfilm',
-            'width': 512,
-            'height': 512,
+            'width': output_json['width'],
+            'height': output_json['height'],
             'rfilter': {
                 'type': 'tent',
             },
@@ -407,10 +425,10 @@ def find_center_of_bounding_box():
     return center, [size_x, size_y, size_z]
 
 def main():
-    sensor = load_sensor(45)
+    sensor = load_sensor(output_json['samples_per_pixel'], output_json['seed'])
 
     scene = load_scene(light_radiance=10, constant_radiance=0, add_floor=True, add_object=True)
-    image = mitsuba.render(scene, spp=224, sensor=sensor)
+    image = mitsuba.render(scene, spp=output_json['samples_per_pixel'], sensor=sensor)
     mitsuba.util.write_bitmap("result" + ".png", image)
     
     

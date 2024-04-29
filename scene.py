@@ -2,6 +2,7 @@ import mitsuba
 import numpy as np
 import math
 import json
+from variables import *
 
 import sys
 import os
@@ -9,10 +10,14 @@ import os
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
-from camera import Camera
+from camera import *
 from object import Object
 
-mitsuba.set_variant("llvm_ad_rgb")
+if(use_gpu):
+    mitsuba.set_variant("cuda_ad_rgb")
+    print("Running with cuda...")
+else:
+    mitsuba.set_variant("llvm_ad_rgb")
 
 from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T
@@ -46,7 +51,12 @@ class Scene:
             
             distance = max(self.sizes)*2*multiplier
 
-        self.camera = Camera(output_json['fov'], distance, target, output_json['up_axis'], output_json['width'], output_json['height'], output_json['samples_per_pixel'], output_json['rotation_axis'])
+        if 'seed' in output_json:
+            seed = output_json['seed']
+        else:
+            seed = 0
+
+        self.camera = Camera(output_json['fov'], distance, target, output_json['up_axis'], output_json['width'], output_json['height'], output_json['samples_per_pixel'], seed, output_json['rotation_axis'])
 
 
         self.lights = self.get_lights_from_json()
