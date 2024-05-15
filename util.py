@@ -4,6 +4,7 @@ import json
 import cv2 as cv
 import time
 import variables  
+import config as cf
 
 def main():
 
@@ -16,28 +17,21 @@ def main():
         json_files = sorted(json_files, key=lambda x: int(''.join(filter(str.isdigit, x))))
 
     for i in range(1,len(json_files)+1):
-        print("Processing", json_files[i-1])
-
         if(os.path.isfile(folder_json_path)):
             config = json_files[i-1]
         else:
             config = os.path.join(folder_json_path, json_files[i-1])
-        with open(config, 'r') as file:
-            data = json.load(file)
 
-        if('use_gpu' in data):
-            variables.use_gpu = data['use_gpu']
+        variables.config = cf.Config(config)
         import output
-
-        output_json = data['output']
         
-        if output_json['type'] == "animation_video":
-            output.AnimationVideo(config, output_json["results_folder"], "frames" + str(i) + "/", "video.avi", output_json['rotation_degrees'])
-        elif output_json['type'] == "rotation_video":
-            output.RotationVideo(config, output_json["results_folder"], "frames" + str(i) + "/", "video" + str(i) + ".avi")
-            video=cv.VideoWriter(output_json["results_folder"] + "video" + str(i) + ".avi",cv.VideoWriter_fourcc(*'XVID'),5,(512,512))
+        if variables.config.output_type == "animation_video":
+            output.AnimationVideo(variables.config.results_folder, "frames" + str(i) + "/", "video.avi", variables.config.rotation_degrees)
+        elif variables.config.output_type == "rotation_video":
+            output.RotationVideo(variables.config.results_folder, "frames" + str(i) + "/", "video" + str(i) + ".avi")
+            video=cv.VideoWriter(variables.config.results_folder + "video" + str(i) + ".avi", cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.width))
             
-            folder_path = output_json["results_folder"] + "frames" + str(i) + "/"
+            folder_path = variables.config.results_folder + "frames" + str(i) + "/"
 
             # List all files in the folder
             files = os.listdir(folder_path)
@@ -49,8 +43,8 @@ def main():
 
             video.release()
         
-        elif output_json['type'] == "image":
-            output.ImageOutput(config, output_json["results_folder"], str(i) + ".png", output_json['rotation_degrees'])
+        elif variables.config.output_type == "image":
+            output.ImageOutput(variables.config.results_folder, str(i) + ".png", variables.config.rotation_degrees)
     
 if __name__ == "__main__":
     main()

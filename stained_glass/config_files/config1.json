@@ -5,7 +5,7 @@
       "fov": 45,
       "width": 512,
       "height": 512,
-      "samples_per_pixel": 10000,
+      "samples_per_pixel": 40000,
       "seed": 0
     },
     "files": {

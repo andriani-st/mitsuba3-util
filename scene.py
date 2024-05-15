@@ -3,6 +3,7 @@ import numpy as np
 import math
 import json
 from variables import *
+import config as cf
 
 import sys
 import os
@@ -13,9 +14,8 @@ sys.path.append(parent_dir)
 from camera import *
 from object import Object
 
-if(use_gpu):
+if(config.use_gpu):
     mitsuba.set_variant("cuda_ad_rgb")
-    print("Running with cuda...")
 else:
     mitsuba.set_variant("llvm_ad_rgb")
 
@@ -23,84 +23,50 @@ from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T
 
 class Scene:
-    def __init__(self, config_file, objects = []):
-        with open(config_file, 'r') as file:
-            self.data = json.load(file)
-
+    def __init__(self, objects = []):
         if len(objects)==0:
             self.objects = self.get_objects_from_json()
         else:
             self.objects = objects
 
         self.center, self.sizes = self.find_center_of_bounding_box()
-
-        output_json = self.data['output']
-
-        if(not 'target' in output_json or output_json['target']=="auto"):
+        
+        if config.target == "auto":
             target = self.center
         else:
-            target = output_json['target']
+            target = config.target
 
-        if 'distance' in output_json:
-            distance = output_json['distance']
+        if config.distance == "auto":
+            distance = max(self.sizes)*2*config.distance_multiplier
         else:
-            multiplier = 1
-            if 'target' in output_json:
-                if(output_json['distance_from_target_sign'] == "-"):
-                    multiplier = -1
-            
-            distance = max(self.sizes)*2*multiplier
+            distance = config.distance
 
-        if 'seed' in output_json:
-            seed = output_json['seed']
-        else:
-            seed = 0
-
-        self.camera = Camera(output_json['fov'], distance, target, output_json['up_axis'], output_json['width'], output_json['height'], output_json['samples_per_pixel'], seed, output_json['rotation_axis'])
+        self.camera = Camera(config.fov, distance, target, config.up_axis, config.width, config.height, config.samples_per_pixel, config.seed, config.rotation_axis)
 
 
         self.lights = self.get_lights_from_json()
-        if('add_floor' in output_json and output_json['add_floor']==False):
-            self.add_floor = False
-        else:
-            self.add_floor = True
-
-        if('add_background' in output_json and output_json['add_background']==False):
-            self.add_background = False
-        else:
-            self.add_background = True
-
-        if('floor_type' in output_json and output_json['floor_type']=="checkerboard"):
-            self.floor_type = "checkerboard"
-        else:
-            self.floor_type = "diffuse"
-
-        if('floor_color' in output_json):
-            self.floor_color = output_json['floor_color']
-        else:
-            self.floor_color = [0.1, 0.25, 0.3]
 
         self.constant_radiance = 0
 
     def get_objects_from_json(self):
         objects = []
-        objects_json = self.data['objects']
-        for object_json in objects_json:
-            object = Object(object_json)
+        objects_info = config.objects
+        for object_info in objects_info:
+            object = Object(object_info)
             objects.append(object)
 
         return objects
     
     def get_lights_from_json(self):
         lights = []
-        lights_json = self.data['lights']
 
-        for data in lights_json:
-            if data['emitter_type'] == "area":
-                scale_vector, position, rotation = self.get_lights_position_info(data)
+        light_obj : cf.LightConfig
+        for light_obj in config.lights:
+            if light_obj.emitter_type == "area":
+                scale_vector, position, rotation = self.get_lights_position_info(light_obj)
 
                 to_world = T.translate(position).scale(scale_vector) @ rotation
-                light = {'type': data['emitter_shape'], 
+                light = {'type': light_obj.emitter_shape, 
                          'to_world':to_world, 
                          'bsdf': {
                             'type': 'diffuse',
@@ -110,18 +76,18 @@ class Scene:
                                 }
                          },
                          'emitter': {
-                            'type': data['emitter_type'], 
+                            'type': light_obj.emitter_type, 
                             'radiance': {
                                 'type': 'rgb', 
-                                'value': data['radiance']
+                                'value': light_obj.emitter_radiance
                             },
                           }
                         }
-            elif data['emitter_type'] == "envmap":
+            elif light_obj.emitter_type == "envmap":
                 light = {'type': 'envmap',
-                         'filename': data['filename'],
-                         'to_world': T.rotate([1, 0, 0], 90),
-                         'scale': 0.5
+                         'filename': light_obj.envmap_filename,
+                         'to_world': T.rotate(light_obj.envmap_rotation_axis, light_obj.envmap_rotation_degrees),
+                         'scale': light_obj.envmap_scale_factor
                         }
             
             lights.append(light)
@@ -138,7 +104,6 @@ class Scene:
         }
 
         for object in self.objects:
-            #print(object.name)
             my_scene[object.name] = {'type': object.type, 'filename': object.filename}
 
         scene = mitsuba.load_dict(my_scene)    
@@ -219,7 +184,7 @@ class Scene:
             }
             my_scene['constant_lighting'] = constant_lighting
 
-        if(self.add_floor):
+        if(config.add_floor):
             rotation_axis, rotation_angle, floor_center = self.get_floor_position_info()
             
             floor = {
@@ -227,23 +192,23 @@ class Scene:
                 'to_world': T.translate(floor_center).rotate(rotation_axis,rotation_angle).scale([max(self.sizes)*10,max(self.sizes)*10,max(self.sizes)*10]),
             }
 
-            if(self.floor_type == "checkerboard"):
+            if(config.floor_type == "checkerboard"):
                 bsdf = {
-                    'type': self.floor_type
+                    'type': config.floor_type
                 }
             else:
                 bsdf = {
-                    'type': self.floor_type,
+                    'type': config.floor_type,
                     'reflectance': {
                         'type': 'rgb',
-                        'value': self.floor_color
+                        'value': config.floor_color
                     }
                 }
             
             floor['bsdf'] = bsdf
             my_scene['floor'] = floor
 
-        if(self.add_background):
+        if(config.add_background):
             rotation_axis, rotation_angle, floor_center = self.get_background_position_info()
             
             floor = {
@@ -275,89 +240,85 @@ class Scene:
     
     
     
-    def get_lights_position_info(self, data):
+    def get_lights_position_info(self, light : cf.LightConfig):
         #Size of light
         scale_vector = [max(self.sizes),max(self.sizes),max(self.sizes)]
-        if data['emitter_shape'] == "rectangle":
+        if light.emitter_shape == "rectangle":
             scale_vector = [x*3 for x in scale_vector]
-        if 'size' in data:
-            if data['size'] == "small":
-                scale_vector = [x/6 for x in scale_vector]
-            elif data['size'] == "medium":
-                scale_vector = [x/3 for x in scale_vector]
-            elif data['size'] == "large":
-                scale_vector = [x/2 for x in scale_vector]
-            else:
-                scale_vector = data['size']
-        else:
+        
+        if light.emitter_size == "small":
+            scale_vector = [x/6 for x in scale_vector]
+        elif light.emitter_size == "medium":
             scale_vector = [x/3 for x in scale_vector]
+        elif light.emitter_size == "large":
+            scale_vector = [x/2 for x in scale_vector]
+        else:
+            scale_vector = light.emitter_size
         
         bottom_offset = np.array([self.sizes[0]/2-scale_vector[0], self.sizes[1]/2-scale_vector[1], self.sizes[2]/2-scale_vector[2]])
 
         #Distance of light from object
         distances = np.array([self.sizes[0], self.sizes[1], self.sizes[2]])
-        if 'distance_from_object' in data:
-            if data['distance_from_object'] == "small":
-                distances = distances
-            elif data['distance_from_object'] == "medium":
-                distances = [x*2 for x in distances]
-            elif data['distance_from_object'] == "large":
-                distances = [x*3 for x in distances]
-            else:
-                distances = data['distance_from_object']
-        else:
+        
+        if light.emitter_distance_from_object == "small":
+            distances = distances
+        elif light.emitter_distance_from_object == "medium":
             distances = [x*2 for x in distances]
+        elif light.emitter_distance_from_object == "large":
+            distances = [x*3 for x in distances]
+        else:
+            distances = light.emitter_distance_from_object
 
         #Position of light
-        if(data['position'] == "top-center"):
+        if(light.emitter_position == "top-center"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis)
             rotation = T.rotate(self.camera.side_axis, 180)
-        elif(data['position'] == "top-right"):
+        elif(light.emitter_position == "top-right"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis)
             rotation = T.rotate(self.camera.side_axis, 180).rotate(self.camera.depth_axis, 45)
-        elif(data['position'] == "top-left"):
+        elif(light.emitter_position == "top-left"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis)
             rotation = T.rotate(self.camera.side_axis, 180).rotate(self.camera.depth_axis, -45)
-        elif(data['position'] == "bottom-left"):
+        elif(light.emitter_position == "bottom-left"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis)
             rotation = T.rotate(self.camera.side_axis, 90).rotate(self.camera.depth_axis, -90)
-        elif(data['position'] == "bottom-right"):
+        elif(light.emitter_position == "bottom-right"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis)
             rotation = T.rotate(self.camera.side_axis, 90).rotate(self.camera.depth_axis, 90)
-        elif(data['position'] == "top-center-front"):
+        elif(light.emitter_position == "top-center-front"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -225)
-        elif(data['position'] == "top-left-front"):
+        elif(light.emitter_position == "top-left-front"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis) + np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, 135).rotate(self.camera.depth_axis, 45)
-        elif(data['position'] == "top-right-front"):
+        elif(light.emitter_position == "top-right-front"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis) + np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, 135).rotate(self.camera.depth_axis, -45)
-        elif(data['position'] == "bottom-center-front"):
+        elif(light.emitter_position == "bottom-center-front"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, 90)
-        elif(data['position'] == "bottom-left-front"):
+        elif(light.emitter_position == "bottom-left-front"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis) + np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, 90).rotate(self.camera.depth_axis, -45)
-        elif(data['position'] == "bottom-right-front"):
+        elif(light.emitter_position == "bottom-right-front"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis) + np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, 90).rotate(self.camera.depth_axis, 45)
-        elif(data['position'] == "top-center-back"):
+        elif(light.emitter_position == "top-center-back"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.side_axis, -45)
-        elif(data['position'] == "top-left-back"):
+        elif(light.emitter_position == "top-left-back"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, -45).rotate(self.camera.side_axis, -45)
-        elif(data['position'] == "top-right-back"):
+        elif(light.emitter_position == "top-right-back"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, 45).rotate(self.camera.side_axis, -45)
-        elif(data['position'] == "bottom-center-back"):
+        elif(light.emitter_position == "bottom-center-back"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -90)
-        elif(data['position'] == "bottom-left-back"):
+        elif(light.emitter_position == "bottom-left-back"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, -45)
-        elif(data['position'] == "bottom-right-back"):
+        elif(light.emitter_position == "bottom-right-back"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, 45)
 
