@@ -1,0 +1,52 @@
+{
+  "use_gpu": true,
+  "output": {
+    "type": "image",
+    "results_folder": "",
+    "rotation_degrees": 0,
+    "rotation_step": 1,
+    "width": 512,
+    "height": 512,
+    "fps": 5,
+    "target": "auto",
+    "distance": "auto",
+    "distance_from_target_sign": "+",
+    "seed": 0,
+    "fov": 45,
+    "samples_per_pixel": 1024,
+    "up_axis": [0,0,1],
+    "rotation_axis": [0,0,1],
+    "add_floor": true,
+    "floor_type": "diffuse",
+    "floor_color": [0.1, 0.25, 0.3],
+    "add_background": true
+  },
+  "objects": [
+    {
+      "name": "My object",
+      "filename": "obj_files/cylinder.obj",
+      "type": "obj",
+      "material": {
+        "type": "roughmetal",
+        "color": [0.1, 0.27, 0.36],
+        "metal_type": "Au",
+        "alpha": 0.1
+      }
+    }
+  ],
+  "lights": [
+    {
+      "name": "light1",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "filename": "",
+      "rotation_axis": [1,0,0],
+      "rotation_degrees": 0,
+      "scale_factor": 0.5,
+      "radiance": 100,
+      "size": "medium",
+      "distance_from_object": "medium",
+      "position": "top-left"
+    }
+  ]
+}

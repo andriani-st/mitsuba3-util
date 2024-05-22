@@ -203,7 +203,7 @@ class LightConfig:
             self.emitter_distance_from_object = light_config_file['distance_from_object']
 
         if not 'position' in light_config_file:
-            self.emitter_position = "top_center"
+            self.emitter_position = "top-center"
         else:
             self.emitter_position = light_config_file['position']       
 
