@@ -1,0 +1,23 @@
+{
+  "output": {
+   "type": "image",
+   "spp": 2048,
+   "width": 512,
+   "height": 512
+  },
+  "camera": {
+    "fov": 45
+  },
+  "lights": {
+    "radiance": 10 
+  },
+  "objects": [
+    {
+        "name": "surface",
+        "filename": "image_surface.obj",
+        "material": {
+           "type": "metal"
+        }
+    }
+  ]
+}

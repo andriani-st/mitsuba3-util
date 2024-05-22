@@ -1,20 +1,21 @@
 format compact
 close all; clear; clc;
 
-I = double(imread('flower.png'));%/255;
-R = double(imread('flower.png'));
+I = double(imread('image2.jpg'));%/255;
+R = double(imread('image2.jpg'));
 
 
 % Get the size of the image
 [height, width, ~] = size(I);
 
 [skeletonPoints, frameEdges] = getFrameInfo(height, width, 20);
+skeletonPoints = [skeletonPoints(:,2) skeletonPoints(:,1)];
 
 piecesEdges = [];
 numPoints = size(skeletonPoints,1);
 numOuterSkeletonPoints = size(skeletonPoints,1);
 
-n = 3;
+n = 500;
 distortionFactor = 0;
 x = round(1 + rand([1 n]) * (size(I,2)-2));
 y = round(1 + rand([1 n]) * (size(I,1)-2));

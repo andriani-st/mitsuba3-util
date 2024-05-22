@@ -1,23 +1,11 @@
 {
+  "use_gpu": true,
+  "filigree_path": "image_surface.obj",
   "output": {
-   "type": "image",
-   "spp": 2048,
-   "width": 512,
-   "height": 512
-  },
-  "camera": {
-    "fov": 45
-  },
-  "lights": {
-    "radiance": 10 
-  },
-  "objects": [
-    {
-        "name": "surface",
-        "filename": "image_surface.obj",
-        "material": {
-           "type": "metal"
-        }
-    }
-  ]
+    "fov": 45,
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 1024,
+    "seed": 0
+  }
 }

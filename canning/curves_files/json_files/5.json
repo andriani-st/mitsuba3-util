@@ -1,0 +1,43 @@
+{
+  "output": {
+    "type": "image",
+    "results_folder": "/home/andriani/Documents/Master_thesis/mitsuba3-util/canning/results/",
+    "rotation_axis": [0,0,1],
+    "rotation_degrees": 360,
+    "rotation_step":10,
+    "fov": 45,
+    "up_axis": [0,0,1],
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 2070,
+    "add_floor": true,
+    "add_background": false
+  },
+  "objects": [
+    {
+      "name": "curves",
+      "filename": "/home/andriani/Documents/Master_thesis/mitsuba3-util/canning/curves_files/5/curves_twist_1.txt",
+      "type":"linearcurve",
+      "material": {
+        "type": "metal",
+        "color": [0.871, 0.804, 0.961]
+      }
+    },
+    {
+      "name": "curves1",
+      "filename": "/home/andriani/Documents/Master_thesis/mitsuba3-util/canning/curves_files/5/curves_twist_2.txt",
+      "type":"linearcurve",
+      "material": {
+        "type": "glass",
+        "color": [0.047058823529411764, 0.2549019607843137, 0.3764705882352941]
+      }
+    }
+  ],
+  "lights": [
+    {
+      "name": "light2",
+      "emitter_type": "envmap",
+      "filename": "/home/andriani/Documents/Master_thesis/mitsuba3-util/envmaps/thatch_chapel_4k_resized.hdr"
+    }
+  ]
+}
