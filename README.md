@@ -70,23 +70,42 @@ To run the util
 python3 util.py /path/to/json/file/config.json
 ```
 
+> Renders image/video using config.json
+
 or
 
 ```
 python3 util.py /path/to/folder/containing/multiple/json/files/
 ```
 
+> Renders images/videos using all json files in /path/to/folder/containing/multiple/json/files/ folder
+
+## Stained glass
+
 For rendering stained_glass in a room:
 ```
 cd stained_glass
-python3 stained_glass_room.py
+python3 stained_glass_room.py /path/to/json/file/config.json
 ```
-For stained_glass_room.py to run: skeleton.obj, colors.txt and tiles/ folder (all produced by running the MATLAB script RUNME.m) must be in stained_glass folder.
+For stained_glass_room.py to run a configuration file of the following structure is required:
+```
+{
+    "output": {
+      "type": "image",
+      "fov": 45,
+      "width": 512,
+      "height": 512,
+      "samples_per_pixel": 20000000
+    },
+    "files": {
+        "tiles_path": "example_files/1/tiles/",
+        "skeleton_path": "example_files/1/skeleton.obj",
+        "colors_path": "example_files/1/colors.txt"
+    }
+}
+```
 
-The quality of the image can be changed by modifying line 413 (spp parameter) of stained_glass_room.py:
-```
-image = mitsuba.render(scene, spp=224, sensor=sensor)
-```
+> In folder mitsuba3-util/stained_glass/config_files examples of configuration files can be found and in mitsuba3-util/stained_glass/example_files examples of obj files produced by the MATLAB script can be found.
 
 By modifying the config.json that passes as an argument above, the following outputs are available:
 - Rendered png images of specified size and quality
@@ -142,33 +161,37 @@ A basic configuration file for creating a rotation video of an OBJ file will loo
 ```
 {
   "output": {
-    "type": "rotation-video",
-    "num_views": 360,
-    "spp": 1024,
-    "width": 512
-    "height": 512
-},
-"camera": {
-  "fov": 45,
-},
-"objects": [
-  {
-      "name": "glass",
-      "filename": "glass.obj",
+    "type": "rotation_video",
+    "rotation_axis": [0,0,1],
+    "rotation_degrees": 360,
+    "rotation_step":10,
+    "fov": 45,
+    "up_axis": [0,0,1],
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 224,
+    "add_floor": true,
+    "add_background": false,
+    "results_folder": ""
+  },
+  "objects": [
+    {
+      "name": "glass_cylinder",
+      "filename": "obj_files/cylinder.obj",
+      "type":"obj",
       "material": {
-         "type": "glass"
+        "type": "glass",
+        "color": [0.871, 0.804, 0.961]
       }
-  }
-],
-"lights": [
-  {
+    }
+  ],
+  "lights": [
+    {
       "name": "light1",
-      "emitter_type": "area",
-      "emitter_shape": "rectangle",
-      "position": "back"
-      "radiance": 10
-  }
-]
+      "emitter_type": "envmap",
+      "filename":"envmaps/christmas_photo_studio_4k_resized.hdr"
+    }
+  ]
 }
 ```
 
@@ -180,37 +203,76 @@ A basic configuration file for creating an animation video from OBJ frames:
 ```
 {
   "output": {
-    "type": "animation-video",
-    "spp": 1024,
-    "width": 512
-    "height": 512
-},
-"camera": {
-  "fov": 45,
-},
-"add_floor": "false",
-"objects": [
-  {
-      "name": "cube"
-      "frames_folder": "path/to/folder/frames/cube/",
-      "material": "diffuse"
+    "type": "animation_video",
+    "rotation_axis": [0,1,0],
+    "rotation_degrees": 360,
+    "rotation_step":10,
+    "fov": 45,
+    "up_axis": [0,1,0],
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 1024,
+    "add_floor": true,
+    "add_background": false,
+    "results_folder": ""
   },
-  {
-      "name": "bullet"
-      "frames_folder": "path/to/folder/frames/bullet/",
-      "material": "diffuse"
-  }
-],
-"lights": [
-  {
+  "objects": [
+    {
+      "name": "material",
+      "filename": "animation_files/01_cutting/3d_out/material/",
+      "type":"obj",
+      "material": {
+        "type": "metal"
+      }
+    },
+    {
+      "name": "tool",
+      "filename": "animation_files/01_cutting/3d_out/tool/",
+      "type":"obj",
+      "material": {
+        "type": "roughglass"
+      }
+    },
+    {
+      "name": "scene",
+      "filename": "animation_files/01_cutting/3d_out/scene/floor.obj",
+      "type":"obj",
+      "material": {
+        "type": "plastic"
+      }
+    }
+  ],
+  "lights": [
+    {
       "name": "light1",
       "emitter_type": "area",
       "emitter_shape": "sphere",
-      "position": "top-center"
-      "radiance": 10
-  }
-]
+      "position": "top-center",
+      "radiance": 100,
+      "distance_from_object": "large",
+      "size": "small"
+    },
+    {
+      "name": "light2",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-right",
+      "radiance": 100,
+      "distance_from_object": "large",
+      "size": "large"
+    },
+    {
+      "name": "light3",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "position": "top-left",
+      "radiance": 100,
+      "distance_from_object": "large",
+      "size": "large"
+    }
+  ]
 }
+
 ```
 
 The above configuration file creates a .avi animation video. Some selected frames of that video:
