@@ -80,6 +80,429 @@ python3 util.py /path/to/folder/containing/multiple/json/files/
 
 > Renders images/videos using all json files in /path/to/folder/containing/multiple/json/files/ folder
 
+## Creating the configuration file
+The general json schema of the configuration file is the following:
+```
+{
+    "type": "object",
+    "title": "Root Schema",
+    "required": [
+        "output",
+        "objects",
+        "lights"
+    ],
+    "properties": {
+        "use_gpu": {
+            "type": "boolean",
+            "default": true
+        },
+        "output": {
+            "type": "object"
+        },
+        "objects": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        },
+        "lights": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        }
+    }
+}
+```
+As shown above the field `use_gpu` is optional, with a default value "true" when not provided, and the `output`, `objects`, `lights` fields are required. In the three subsections that follow the schema of each of the required json arrays is presented in detail.
+
+> Note tha in case a field that is not needed is provided, it will simpy be ignored. 
+
+> e.g. if `rotation_step` field is provided when output's `type` is image.
+
+### "output" field: Camera and output settings
+The schema of the `output` field is the following:
+```
+"output": {
+    "type": "object",
+    "title": "The output Schema",
+    "properties": {
+        "type": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "image",
+                "animation_video",
+                "rotation_video"
+            ]
+        },
+        "results_folder": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "",
+                "path/to/folder/"
+            ]
+        },
+        "rotation_degrees": {
+            "type": "integer",
+            "default": 0,
+            "examples": [
+                0,
+                360
+            ]
+        },
+        "rotation_step": {
+            "type": "integer",
+            "default": 0,
+            "examples": [
+                1,
+                10
+            ]
+        },
+        "width": {
+            "type": "integer",
+            "default": 512,
+            "examples": [
+                512,
+                1024
+            ]
+        },
+        "height": {
+            "type": "integer",
+            "default": 512,
+            "examples": [
+                512,
+                1080
+            ]
+        },
+        "fps": {
+            "type": "integer",
+            "default": 5,
+            "examples": [
+                5,
+                25
+            ]
+        },
+        "target": {
+            "type": "string",
+            "default": "auto",
+            "examples": [
+                "auto",
+                [0, 0, 0]
+            ]
+        },
+        "distance": {
+            "type": "number",
+            "default": "auto",
+            "examples": [
+                "auto",
+                100.5
+            ]
+        },
+        "distance_from_target_sign": {
+            "type": "string",
+            "default": "+",
+            "examples": [
+                "+",
+                "-"
+            ]
+        },
+        "seed": {
+            "type": "integer",
+            "default": 0,
+            "examples": [
+                0,
+                17
+            ]
+        },
+        "fov": {
+            "type": "integer",
+            "default": 45,
+            "examples": [
+                45
+            ]
+        },
+        "samples_per_pixel": {
+            "type": "integer",
+            "default": 0,
+            "title": "The samples_per_pixel Schema",
+            "examples": [
+                224
+            ]
+        },
+        "up_axis": {
+            "type": "array",
+            "default": [
+                [0, 0, 1]
+            ],
+            "items": {
+                "type": "integer"
+            },
+            "examples": [
+                [0, 0, 1],
+                [0, 1, 0],
+                [1, 0, 0]
+            ]
+        },
+        "rotation_axis": {
+            "type": "array",
+            "default": [0, 0, 1],
+            "items": {
+                "type": "integer"
+            },
+            "examples": [
+                [0, 0, 1],
+                [0, 1, 0],
+                [1, 0, 0]
+            ]
+        },
+        "add_floor": {
+            "type": "boolean",
+            "default": true
+        },
+        "floor_type": {
+            "type": "string",
+            "default": "diffuse",
+            "title": "The floor_type Schema",
+            "examples": [
+                "diffuse",
+                "checkerboard"
+            ]
+        },
+        "floor_color": {
+            "type": "array",
+            "default": [
+                [0.1, 0.25, 0.3]
+            ],
+            "items": {
+                "type": "number"
+            },
+            "examples": [
+                [0.1, 0.25, 0.3],
+                [0.5, 0.35, 0.13]
+            ]
+        },
+        "add_background": {
+            "type": "boolean",
+            "default": false
+        }
+    }
+}
+```
+
+The fields of type number or integer can take any positive value (or string "auto" in some cases). The fields of type string only support the values provided in `examples` array. 
+
+### "objects" field: Object settings
+
+```
+"objects": {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "name",
+            "filename",
+            "type",
+            "material"
+        ],
+        "properties": {
+            "name": {
+                "type": "string",
+                "examples": [
+                    "My metal object"
+                ]
+            },
+            "filename": {
+                "type": "string",
+                "examples": [
+                    "path/to/myobject.obj"
+                ]
+            },
+            "type": {
+                "type": "string",
+                "examples": [
+                    "obj",
+                    "ply",
+                    "linearcurve"
+                ]
+            },
+            "material": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "default": "diffuse",
+                        "examples": [
+                            "metal",
+                            "plastic",
+                            "roughmetal",
+                            "roughplastic",
+                            "glass",
+                            "thinglass",
+                            "roughglass",
+                            "diffuse",
+                            "conductor",
+                            "roughconductor",
+                            "dielectric",
+                            "thindielectric",
+                            "roughdielectric",
+                        ]
+                    },
+                    "color": {
+                        "type": "array",
+                        "default": [
+                            [0.1, 0.27, 0.36]
+                        ],
+                        "items": {
+                            "type": "number"
+                        },
+                        "examples": [
+                            [0.1, 0.27, 0.36]
+                        ]
+                    },
+                    "metal_type": {
+                        "type": "string",
+                        "default": "Au",
+                        "examples": [
+                            "Au",
+                            "Al"
+                        ]
+                    },
+                    "alpha": {
+                        "type": "number",
+                        "default": 0.1,
+                        "examples": [
+                            1
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
+```
+Again, the fields of type number or integer can take any positive value. The fields of type string only support the values provided in `examples` array, except `name` field that can take any string and `metal_type` field that some additional values than the ones is `examples` can be supported.
+
+The `metal_type` field can take any of the following values:
+
+![image](https://github.com/andriani-st/mitsuba3-util/assets/77795248/4a2e064d-65b6-4209-98dc-9171c122f80b)
+
+> source: https://mitsuba.readthedocs.io/en/stable/src/generated/plugins_bsdfs.html
+
+
+### "lights" field: Light settings
+
+```
+"lights": {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "emitter_type",
+            "filename",
+            "name"
+        ],
+        "properties": {
+            "name": {
+                "type": "string",
+                "examples": [
+                    "light1"
+                ]
+            },
+            "emitter_type": {
+                "type": "string",
+                "examples": [
+                    "area",
+                    "envmap"
+                ]
+            },
+            "emitter_shape": {
+                "type": "string",
+                "default": "sphere",
+                "examples": [
+                    "sphere",
+                    "rectangle"
+                ]
+            },
+            "filename": {
+                "type": "string",
+                "examples": [
+                    "path/to/envmap/if/type/envmap"
+                ]
+            },
+            "rotation_axis": {
+                "type": "array",
+                "default": [
+                    [1, 0, 0]
+                ],
+                "items": {
+                    "type": "integer"
+                },
+                "examples": [
+                    [1, 0, 0],
+                    [0, 1, 0],
+                    [0, 0, 1]
+                ]
+            },
+            "rotation_degrees": {
+                "type": "integer",
+                "default": 90
+            },
+            "scale_factor": {
+                "type": "number",
+                "default": 0.5
+            },
+            "radiance": {
+                "type": "integer",
+                "default": 10
+            },
+            "size": {
+                "type": "string",
+                "default": "medium",
+                "examples": [
+                    "medium",
+                    "small",
+                    "large"
+                ]
+            },
+            "distance_from_object": {
+                "type": "string",
+                "default": "medium",
+                "examples": [
+                    "medium",
+                    "small",
+                    "large"
+                ]
+            },
+            "position": {
+                "type": "string",
+                "default": "top-center",
+                "examples": [
+                    "top-center",
+                    "top-right",
+                    "top-left",
+                    "bottom-left",
+                    "bottom-right",
+                    "top-center-front",
+                    "top-left-front",
+                    "top-right-front",
+                    "bottom-center-front",
+                    "bottom-left-front",
+                    "bottom-right-front",
+                    "top-center-back",
+                    "top-left-back",
+                    "top-right-back",
+                    "bottom-center-back",
+                    "bottom-left-back",
+                    "bottom-right-back"
+                ]
+            }
+        }
+    }
+}
+```
+
 ## Stained glass
 
 For rendering stained_glass in a room:
