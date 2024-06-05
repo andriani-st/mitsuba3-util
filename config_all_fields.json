@@ -19,12 +19,13 @@
     "add_floor": true,
     "floor_type": "diffuse",
     "floor_color": [0.1, 0.25, 0.3],
-    "add_background": true
+    "add_background": true,
+    "background_type": "diffuse",
+    "background_color": [0.1, 0.25, 0.3]
   },
   "objects": [
     {
-      "name": "My object",
-      "filename": "obj_files/cylinder.obj",
+      "filename": "/media/andriani/Andriani's Files/Master_thesis/mitsuba3-util/stained_glass/example_files/1/tiles/",
       "type": "obj",
       "material": {
         "type": "roughmetal",
@@ -36,7 +37,6 @@
   ],
   "lights": [
     {
-      "name": "light1",
       "emitter_type": "area",
       "emitter_shape": "sphere",
       "filename": "",

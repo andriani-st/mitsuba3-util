@@ -2,8 +2,8 @@
   "use_gpu": true,
   "output": {
     "type": "image",
-    "rotation_axis": [0,0,1],
-    "rotation_degrees": 360,
+    "rotation_axis": [0,1,0],
+    "rotation_degrees": 180,
     "rotation_step":10,
     "fov": 45,
     "up_axis": [0,0,1],
@@ -12,11 +12,12 @@
     "samples_per_pixel": 1024,
     "seed": 0,
     "add_floor": true,
-    "add_background": true
+    "add_background": true,
+    "background_type": "diffuse",
+    "background_color": [0.1, 0.25, 0.3]
   },
   "objects": [
     {
-      "name": "curves",
       "filename": "obj_files/cylinder.obj",
       "type":"obj",
       "material": {
@@ -26,24 +27,6 @@
     }
   ],
   "lights": [
-    {
-      "name": "light2",
-      "emitter_type": "area",
-      "emitter_shape": "sphere",
-      "position": "top-center",
-      "radiance": 100,
-      "distance_from_object": "medium",
-      "size": "small"
-    },
-    {
-      "name": "light4",
-      "emitter_type": "area",
-      "emitter_shape": "sphere",
-      "position": "top-right",
-      "radiance": 100,
-      "distance_from_object": "large",
-      "size": "large"
-    },
     {
       "name": "light5",
       "emitter_type": "area",

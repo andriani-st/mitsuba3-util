@@ -1,7 +1,5 @@
 import mitsuba
 import numpy as np
-import math
-import json
 from variables import *
 import config as cf
 
@@ -21,6 +19,22 @@ else:
 
 from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T
+
+floor_scale_multiplier = 10
+background_scale_multiplier = 2
+background_distance_multiplier = 2
+
+checkerboard_scale_vector = [1, 1, 0]
+checkerboard_color0 = [0.02, 0.02, 0.02]  
+checkerboard_color1 = [1.0, 1.0, 1.0] 
+
+rectangle_light_scale_multiplier = 3
+small_size_multiplier = 1/6
+medium_size_multiplier = 1/3
+large_size_multiplier = 1/2
+small_distance_multiplier = 1
+medium_distance_multiplier = 2
+large_distance_multiplier = 3
 
 class Scene:
     def __init__(self, objects = []):
@@ -137,20 +151,22 @@ class Scene:
     
     def get_background_position_info(self):
         #We must place the background according to the up_axis
+        distance = [self.camera.depth_axis[0] * self.sizes[0]*background_distance_multiplier, self.camera.depth_axis[1] * self.sizes[1]*background_distance_multiplier, self.camera.depth_axis[2] * self.sizes[2]*background_distance_multiplier]
+        background_center = self.center + distance
+
         if(self.camera.up_axis == [1,0,0]):
             rotation_axis = [0,1,0]
-            rotation_angle = 90
-            floor_center = [self.center[0]-self.sizes[0]/2, self.center[1], self.center[2]]
+            rotation_angle = -180
+            
         elif(self.camera.up_axis == [0,0,1]):
             rotation_axis = [0,1,0]
-            rotation_angle = 0
-            floor_center = [self.center[0], self.center[1], self.center[2]-self.sizes[2]/2]
+            rotation_angle = -90
+            
         elif(self.camera.up_axis == [0,1,0]):
             rotation_axis = [1,0,0]
-            rotation_angle = -90
-            floor_center = [self.center[0], self.center[1]-self.sizes[1]/2, self.center[2]]
+            rotation_angle = 180
 
-        return rotation_axis, rotation_angle, floor_center
+        return rotation_axis, rotation_angle, background_center
     
     def load_scene(self):
         my_scene = {
@@ -184,18 +200,32 @@ class Scene:
             }
             my_scene['constant_lighting'] = constant_lighting
 
+        bsdf_checkerboard = {
+            "type": "diffuse",
+            "reflectance": {
+                "type": "checkerboard",
+                "to_uv": T.scale(checkerboard_scale_vector),
+                "color0": {
+                    "type": "rgb",
+                    "value": checkerboard_color0
+                },
+                "color1": {
+                    "type": "rgb",
+                    "value": checkerboard_color1
+                }
+            }
+        }
+
         if(config.add_floor):
             rotation_axis, rotation_angle, floor_center = self.get_floor_position_info()
             
             floor = {
                 'type': 'rectangle',
-                'to_world': T.translate(floor_center).rotate(rotation_axis,rotation_angle).scale([max(self.sizes)*10,max(self.sizes)*10,max(self.sizes)*10]),
+                'to_world': T.translate(floor_center).rotate(rotation_axis,rotation_angle).scale([max(self.sizes)*floor_scale_multiplier,max(self.sizes)*floor_scale_multiplier,max(self.sizes)*floor_scale_multiplier]),
             }
 
             if(config.floor_type == "checkerboard"):
-                bsdf = {
-                    'type': config.floor_type
-                }
+                bsdf = bsdf_checkerboard
             else:
                 bsdf = {
                     'type': config.floor_type,
@@ -213,24 +243,19 @@ class Scene:
             
             floor = {
                 'type': 'rectangle',
-                'to_world': T.translate(self.center-[0,10,0]).rotate([1,0,0],-90).scale([max(self.sizes)*10,max(self.sizes)*10,max(self.sizes)*10]),
+                'to_world': T.translate(floor_center).rotate(rotation_axis,rotation_angle).scale([max(self.sizes)*background_scale_multiplier,max(self.sizes)*background_scale_multiplier,max(self.sizes)*background_scale_multiplier])
             }
 
-            bsdf = {
-                "type": "diffuse",
-                "reflectance": {
-                    "type": "checkerboard",
-                    "to_uv": T.scale([1, 1, 0]),
-                    "color0": {
-                        "type": "rgb",
-                        "value": [0.02, 0.02, 0.02]  
-                    },
-                    "color1": {
-                        "type": "rgb",
-                        "value": [1.0, 1.0, 1.0] 
+            if(config.background_type == "checkerboard"):
+                bsdf = bsdf_checkerboard
+            else:
+                bsdf = {
+                    'type': config.background_type,
+                    'reflectance': {
+                        'type': 'rgb',
+                        'value': config.floor_color
                     }
                 }
-            }
             
             
             floor['bsdf'] = bsdf
@@ -244,14 +269,14 @@ class Scene:
         #Size of light
         scale_vector = [max(self.sizes),max(self.sizes),max(self.sizes)]
         if light.emitter_shape == "rectangle":
-            scale_vector = [x*3 for x in scale_vector]
+            scale_vector = [x*rectangle_light_scale_multiplier for x in scale_vector]
         
         if light.emitter_size == "small":
-            scale_vector = [x/6 for x in scale_vector]
+            scale_vector = [x*small_size_multiplier for x in scale_vector]
         elif light.emitter_size == "medium":
-            scale_vector = [x/3 for x in scale_vector]
+            scale_vector = [x*medium_size_multiplier for x in scale_vector]
         elif light.emitter_size == "large":
-            scale_vector = [x/2 for x in scale_vector]
+            scale_vector = [x*large_size_multiplier for x in scale_vector]
         else:
             scale_vector = light.emitter_size
         
@@ -261,11 +286,11 @@ class Scene:
         distances = np.array([self.sizes[0], self.sizes[1], self.sizes[2]])
         
         if light.emitter_distance_from_object == "small":
-            distances = distances
+            distances = [x*small_distance_multiplier for x in distances]
         elif light.emitter_distance_from_object == "medium":
-            distances = [x*2 for x in distances]
+            distances = [x*medium_distance_multiplier for x in distances]
         elif light.emitter_distance_from_object == "large":
-            distances = [x*3 for x in distances]
+            distances = [x*large_distance_multiplier for x in distances]
         else:
             distances = light.emitter_distance_from_object
 
@@ -322,5 +347,9 @@ class Scene:
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, 45)
 
+        #No point of rotating a sphere object
+        if light.emitter_shape == "sphere":
+            rotation = T.rotate([1,0,0], 0)
+        
         return scale_vector, position, rotation
 

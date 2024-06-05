@@ -1,5 +1,7 @@
 import json
 from colorama import Fore, Back, Style
+import os
+import copy
 
 class Config:
     def __init__(self, config_file):
@@ -11,9 +13,9 @@ class Config:
         if('use_gpu' in data):
             self.use_gpu = data['use_gpu']
             if(self.use_gpu == True):
-                print(Fore.CYAN + "Running using cuda enabled")
+                print(Fore.CYAN + "Running using cuda enabled" + Style.RESET_ALL)
             else:
-                print(Fore.CYAN + "Running on CPU only enabled")
+                print(Fore.CYAN + "Running on CPU only enabled" + Style.RESET_ALL)
         else:
             self.use_gpu = True
             print(Fore.CYAN + "Running using cuda enabled \n" + Style.RESET_ALL + "(If you want to run on CPU instead set 'use_gpu' field to false in the configuration file)")
@@ -134,6 +136,16 @@ class Config:
         else:
             self.add_background = output['add_background']
 
+        if 'background_type' in output and output['background_type']=="checkerboard":
+            self.background_type = "checkerboard"
+        else:
+            self.background_type = "diffuse"
+
+        if('background_color' in output):
+            self.background_color = output['background_color']
+        else:
+            self.background_color = [0.1, 0.25, 0.3]
+
     def read_lights_json_object(self, data):
         if not 'lights' in data:
             raise SystemExit(Fore.RED + "ERROR: Required json object 'lights' is missing from configuration file" + Style.RESET_ALL)
@@ -150,7 +162,26 @@ class Config:
         objects_json = data['objects']
         self.objects = []
         for object_config in objects_json:
-            self.objects.append(ObjectConfig(object_config))
+            if 'filename' in object_config and os.path.isdir(object_config['filename']):
+                if 'colors_filename' in object_config:
+                    colors = []
+                    with open(object_config['colors_filename'], 'r') as file:
+                        for line in file:
+                            color_components = [float(component)/255 for component in line.split()]
+                            colors.append(color_components)
+
+                    n=len(colors)+1
+                    
+                for i in range(1,n):
+                    object_i_config = copy.deepcopy(object_config)
+                    object_i_config['filename'] = object_config['filename'] + str(i).zfill(3) + '.obj'
+                    object_i_config['name'] = 'tile_' + str(i)
+                    if 'colors_filename' in object_config:
+                        object_i_config['material']['color'] = colors[i-1]
+                    
+                    self.objects.append(ObjectConfig(object_i_config))
+            else:
+                self.objects.append(ObjectConfig(object_config))
 
 class LightConfig:
     def __init__(self, light_config_file):
@@ -208,11 +239,10 @@ class LightConfig:
             self.emitter_position = light_config_file['position']       
 
 class ObjectConfig:
+    object_idx = 0
     def __init__(self, object_config_file):
-        if not 'name' in object_config_file:
-            raise SystemExit(Fore.RED + "ERROR: Required json field 'name' is missing from object in 'objects" + Style.RESET_ALL)
-        else:
-            self.name = object_config_file['name']
+        self.name = 'object_' + str(ObjectConfig.object_idx)
+        ObjectConfig.object_idx += 1
 
         if not 'filename' in object_config_file:
             raise SystemExit(Fore.RED + "ERROR: Required json field 'filename' is missing from object in 'objects" + Style.RESET_ALL)
@@ -233,6 +263,7 @@ class ObjectConfig:
             self.material_type = "diffuse"
         else:
             self.material_type = material['type']
+            self.material = material
 
         if not 'color' in material and (self.material_type == "plastic" or self.material_type == "roughplastic"):
             self.material_color = [0.1, 0.27, 0.36]
