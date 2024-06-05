@@ -33,8 +33,9 @@ class Object:
     elif data.material_type == "diffuse":
       self.material = {'type': 'diffuse'}
     
-    #else:
-    #  self.material = material
+    else:
+      self.material = data.material
+ 
     
 
 
