@@ -11,7 +11,7 @@ else:
 from mitsuba import ScalarTransform4f as T
 
 class Camera:
-    def __init__(self, fov, distance, camera_target, up_axis = np.array([0,1,0]), width = 512, height = 512, spp = 224, seed=0, rotation_axis = [0,0,0]):
+    def __init__(self, fov, distance, camera_target, up_axis = np.array([0,1,0]), width = 512, height = 512, spp = 224, seed=0, rotation_axis = [0,0,0], camera_axis=np.array([0,0,1])):
         self.fov = fov
         self.up_axis = up_axis
         
@@ -47,6 +47,12 @@ class Camera:
             self.side_axis = [1-dummy_axis[0],1-dummy_axis[1],1-dummy_axis[2]]
 
             self.origin = np.array([camera_target[0] + distance*(1-free_axis[0]),camera_target[1] + distance*(1-free_axis[1]),camera_target[2] + distance*(1-free_axis[2])])
+
+        self.depth_axis = camera_axis
+        free_axis = np.array(self.up_axis) + np.array(self.depth_axis)
+        self.side_axis = [1-abs(free_axis[0]),1-abs(free_axis[1]),1-abs(free_axis[2])]
+
+        self.origin = np.array([camera_target[0]+distance*self.depth_axis[0],camera_target[1]+distance*self.depth_axis[1],camera_target[2]+distance*self.depth_axis[2]])
 
     def rotate_camera_origin(self, angle):
         theta = np.radians(angle)
