@@ -13,10 +13,15 @@ class Object:
         self.material = {'type': 'dielectric', 'int_ior': 'bk7', 'ext_ior': 'air', 'specular_transmittance': {'type': 'rgb', 'value': data.material_color}}
   
     elif data.material_type == 'roughglass':
-      self.material = {'type': 'roughdielectric', 'distribution': 'beckmann', 'alpha': data.material_alpha, 'int_ior': 'bk7', 'ext_ior': 'air'}
-    
+      if data.material_color == "auto":
+        self.material = {'type': 'roughdielectric', 'distribution': 'beckmann', 'alpha': data.material_alpha, 'int_ior': 'bk7', 'ext_ior': 'air'}
+      else:
+        self.material = {'type': 'roughdielectric', 'distribution': 'beckmann', 'alpha': data.material_alpha, 'int_ior': 'bk7', 'ext_ior': 'air', 'specular_transmittance': {'type': 'rgb', 'value': data.material_color}}
     elif data.material_type == 'thinglass':
-      self.material = {'type': 'thindielectric', 'int_ior': 'bk7', 'ext_ior': 'air'}
+      if data.material_color == "auto":
+        self.material = {'type': 'thindielectric', 'int_ior': 'bk7', 'ext_ior': 'air'}
+      else:
+        self.material = {'type': 'thindielectric', 'int_ior': 'bk7', 'ext_ior': 'air', 'specular_transmittance': {'type': 'rgb', 'value': data.material_color}}
     
     elif data.material_type == 'plastic':
       self.material = {'type': 'plastic', 'diffuse_reflectance': {'type': 'rgb', 'value': data.material_color}}

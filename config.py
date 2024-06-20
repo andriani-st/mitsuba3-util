@@ -48,7 +48,10 @@ class Config:
             self.results_folder = output['results_folder']
 
         if not 'rotation_degrees' in output:
-            self.rotation_degrees = 0
+            if output["type"] == "rotation_video":
+                self.rotation_degrees = 360
+            else:
+                self.rotation_degrees = 0
         else:
             self.rotation_degrees = output['rotation_degrees']
 
@@ -81,15 +84,6 @@ class Config:
             self.distance = "auto"
         else:
             self.distance = output['distance']
-
-        if not 'distance_from_target_sign' in output:
-            self.distance_multiplier = 1
-        elif output['distance_from_target_sign'] == "+":
-            self.distance_multiplier = 1
-        elif output['distance_from_target_sign'] == "-":
-            self.distance_multiplier = -1
-        else:
-            raise SystemExit(Fore.RED + "ERROR: Unsuported distance_from_target_sign value " + output["distance_from_target_sign"] + Style.RESET_ALL)
         
         if not 'seed' in output:
             self.seed = 0
@@ -110,6 +104,11 @@ class Config:
             self.up_axis = [0,0,1]
         else:
             self.up_axis = output['up_axis']
+
+        if not 'camera_axis' in output:
+            self.camera_axis = [0,1,0]
+        else:
+            self.camera_axis = output['camera_axis']
 
         if not 'rotation_axis' in output:
             self.rotation_axis = [0,0,1]
@@ -171,7 +170,9 @@ class Config:
                             colors.append(color_components)
 
                     n=len(colors)+1
-                    
+                else:
+                    n = len(os.listdir(object_config['filename']))
+                    print(n)
                 for i in range(1,n):
                     object_i_config = copy.deepcopy(object_config)
                     object_i_config['filename'] = object_config['filename'] + str(i).zfill(3) + '.obj'
@@ -199,12 +200,12 @@ class LightConfig:
                 self.envmap_filename = light_config_file['filename']
 
             if 'rotation_axis' not in light_config_file:
-                self.envmap_rotation_axis = [1,0,0]
+                self.envmap_rotation_axis = [0,0,0]
             else:
                  self.envmap_rotation_axis = light_config_file['rotation_axis']
 
             if 'rotation_degrees' not in light_config_file:
-                self.envmap_rotation_degrees = 90
+                self.envmap_rotation_degrees = 0
             else:
                 self.envmap_rotation_degrees = light_config_file['rotation_degrees']
 

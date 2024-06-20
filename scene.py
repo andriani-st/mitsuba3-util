@@ -2,6 +2,7 @@ import mitsuba
 import numpy as np
 from variables import *
 import config as cf
+from colorama import Fore, Back, Style
 
 import sys
 import os
@@ -51,11 +52,11 @@ class Scene:
             target = config.target
 
         if config.distance == "auto":
-            distance = max(self.sizes)*2*config.distance_multiplier
+            distance = max(self.sizes)*2
         else:
             distance = config.distance
 
-        self.camera = Camera(config.fov, distance, target, config.up_axis, config.width, config.height, config.samples_per_pixel, config.seed, config.rotation_axis)
+        self.camera = Camera(config.fov, distance, target, config.up_axis, config.width, config.height, config.samples_per_pixel, config.seed, config.rotation_axis, config.camera_axis)
 
 
         self.lights = self.get_lights_from_json()
@@ -138,14 +139,26 @@ class Scene:
             rotation_axis = [0,1,0]
             rotation_angle = 90
             floor_center = [self.center[0]-self.sizes[0]/2, self.center[1], self.center[2]]
+        elif(self.camera.up_axis == [-1,0,0]):
+            rotation_axis = [0,1,0]
+            rotation_angle = -90
+            floor_center = [self.center[0]+self.sizes[0]/2, self.center[1], self.center[2]]
         elif(self.camera.up_axis == [0,0,1]):
             rotation_axis = [0,1,0]
             rotation_angle = 0
             floor_center = [self.center[0], self.center[1], self.center[2]-self.sizes[2]/2]
+        elif(self.camera.up_axis == [0,0,-1]):
+            rotation_axis = [0,1,0]
+            rotation_angle = 180
+            floor_center = [self.center[0], self.center[1], self.center[2]+self.sizes[2]/2]
         elif(self.camera.up_axis == [0,1,0]):
             rotation_axis = [1,0,0]
             rotation_angle = -90
             floor_center = [self.center[0], self.center[1]-self.sizes[1]/2, self.center[2]]
+        elif(self.camera.up_axis == [0,-1,0]):
+            rotation_axis = [1,0,0]
+            rotation_angle = 90
+            floor_center = [self.center[0], self.center[1]+self.sizes[1]/2, self.center[2]]
 
         return rotation_axis, rotation_angle, floor_center
     
@@ -240,7 +253,7 @@ class Scene:
 
         if(config.add_background):
             rotation_axis, rotation_angle, floor_center = self.get_background_position_info()
-            
+
             floor = {
                 'type': 'rectangle',
                 'to_world': T.translate(floor_center).rotate(rotation_axis,rotation_angle).scale([max(self.sizes)*background_scale_multiplier,max(self.sizes)*background_scale_multiplier,max(self.sizes)*background_scale_multiplier])
@@ -253,7 +266,7 @@ class Scene:
                     'type': config.background_type,
                     'reflectance': {
                         'type': 'rgb',
-                        'value': config.floor_color
+                        'value': config.background_color
                     }
                 }
             
@@ -297,19 +310,19 @@ class Scene:
         #Position of light
         if(light.emitter_position == "top-center"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis)
-            rotation = T.rotate(self.camera.side_axis, 180)
+            rotation = T.rotate(self.camera.up_axis, 90)
         elif(light.emitter_position == "top-right"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis)
-            rotation = T.rotate(self.camera.side_axis, 180).rotate(self.camera.depth_axis, 45)
+            rotation = T.rotate(self.camera.side_axis, 180)
         elif(light.emitter_position == "top-left"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis)
-            rotation = T.rotate(self.camera.side_axis, 180).rotate(self.camera.depth_axis, -45)
+            rotation = T.rotate(self.camera.depth_axis, 180)
         elif(light.emitter_position == "bottom-left"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis)
-            rotation = T.rotate(self.camera.side_axis, 90).rotate(self.camera.depth_axis, -90)
+            rotation = T.rotate(self.camera.depth_axis, 180)
         elif(light.emitter_position == "bottom-right"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis)
-            rotation = T.rotate(self.camera.side_axis, 90).rotate(self.camera.depth_axis, 90)
+            rotation = T.rotate(self.camera.depth_axis, 0)
         elif(light.emitter_position == "top-center-front"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.depth_axis)
             rotation = T.rotate(self.camera.side_axis, -225)
@@ -324,29 +337,43 @@ class Scene:
             rotation = T.rotate(self.camera.side_axis, 90)
         elif(light.emitter_position == "bottom-left-front"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis) + np.array(distances) * np.array(self.camera.depth_axis)
-            rotation = T.rotate(self.camera.side_axis, 90).rotate(self.camera.depth_axis, -45)
+            if light.emitter_shape == "rectangle":
+                print(Fore.LIGHTYELLOW_EX + "Warning: bottom-left-front position not supported for rectange, setting to bottom-center-back" + Style.RESET_ALL)
+                light.emitter_position = "bottom-center-back"
         elif(light.emitter_position == "bottom-right-front"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis) + np.array(distances) * np.array(self.camera.depth_axis)
-            rotation = T.rotate(self.camera.side_axis, 90).rotate(self.camera.depth_axis, 45)
+            if light.emitter_shape == "rectangle":
+                print(Fore.LIGHTYELLOW_EX + "Warning: bottom-right-front position not supported for rectange, setting to bottom-center-back" + Style.RESET_ALL)
+                light.emitter_position = "bottom-center-back"
         elif(light.emitter_position == "top-center-back"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.depth_axis)
-            rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.side_axis, -45)
+            if light.emitter_shape == "rectangle":
+                print(Fore.LIGHTYELLOW_EX + "Warning: top-center-back position not supported for rectange, setting to bottom-center-back" + Style.RESET_ALL)
+                light.emitter_position = "bottom-center-back"
         elif(light.emitter_position == "top-left-back"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
-            rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, -45).rotate(self.camera.side_axis, -45)
+            if light.emitter_shape == "rectangle":
+                print(Fore.LIGHTYELLOW_EX + "Warning: top-left-back position not supported for rectange, setting to bottom-center-back" + Style.RESET_ALL)
+                light.emitter_position = "bottom-center-back"
         elif(light.emitter_position == "top-right-back"):
             position = np.array(self.center) + np.array(distances)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
-            rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, 45).rotate(self.camera.side_axis, -45)
+            if light.emitter_shape == "rectangle":
+                print(Fore.LIGHTYELLOW_EX + "Warning: top-right-back position not supported for rectange, setting to bottom-center-back" + Style.RESET_ALL)
+                light.emitter_position = "bottom-center-back"
         elif(light.emitter_position == "bottom-center-back"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.depth_axis)
-            rotation = T.rotate(self.camera.side_axis, -90)
+            rotation = T.rotate(self.camera.up_axis, 90)
         elif(light.emitter_position == "bottom-left-back"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) + np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
-            rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, -45)
+            rotation = T.rotate(self.camera.up_axis, 90)
         elif(light.emitter_position == "bottom-right-back"):
             position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.side_axis) - np.array(distances) * np.array(self.camera.depth_axis)
-            rotation = T.rotate(self.camera.side_axis, -90).rotate(self.camera.depth_axis, 45)
+            rotation = T.rotate(self.camera.up_axis, 90)
 
+        if(light.emitter_position == "bottom-center-back"):
+            position = np.array(self.center) - np.array(bottom_offset)* np.array(self.camera.up_axis) - np.array(distances) * np.array(self.camera.depth_axis)
+            rotation = T.rotate(self.camera.up_axis, 90)
+        
         #No point of rotating a sphere object
         if light.emitter_shape == "sphere":
             rotation = T.rotate([1,0,0], 0)

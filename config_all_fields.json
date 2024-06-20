@@ -13,25 +13,23 @@
     "distance_from_target_sign": "+",
     "seed": 0,
     "fov": 45,
-    "samples_per_pixel": 1024,
-    "up_axis": [0,0,1],
-    "rotation_axis": [0,0,1],
+    "samples_per_pixel": 224,
+    "up_axis": [0,1,0],
+    "camera_axis": [1,0,0],
+    "rotation_axis": [1,0,0],
     "add_floor": true,
     "floor_type": "diffuse",
-    "floor_color": [0.1, 0.25, 0.3],
-    "add_background": true,
+    "floor_color": [0.5, 0.5, 0.5],
+    "add_background": false,
     "background_type": "diffuse",
-    "background_color": [0.1, 0.25, 0.3]
+    "background_color": [0.5, 0.1, 0.3]
   },
   "objects": [
     {
-      "filename": "/media/andriani/Andriani's Files/Master_thesis/mitsuba3-util/stained_glass/example_files/1/tiles/",
+      "filename": "obj_files/cylinder.obj",
       "type": "obj",
       "material": {
-        "type": "roughmetal",
-        "color": [0.1, 0.27, 0.36],
-        "metal_type": "Au",
-        "alpha": 0.1
+        "type": "roughmetal"
       }
     }
   ],
