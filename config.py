@@ -20,9 +20,19 @@ class Config:
             self.use_gpu = True
             print(Fore.CYAN + "Running using cuda enabled \n" + Style.RESET_ALL + "(If you want to run on CPU instead set 'use_gpu' field to false in the configuration file)")
         
+        if('filigree_path' in data):
+            data['output']['type'] = "image"
+            self.filigree_path = data['filigree_path']
+            if('lights_radiance' in data):
+                self.room_lights_radiance = data['lights_radiance']
+            else:
+                self.room_lights_radiance = 10
+
         self.read_output_json_object(data)
-        self.read_lights_json_object(data)
-        self.read_objects_json_object(data)
+
+        if(not 'filigree_path' in data):
+            self.read_lights_json_object(data)
+            self.read_objects_json_object(data)
 
         print(Back.GREEN + "Done" + Style.RESET_ALL)
             
@@ -237,7 +247,17 @@ class LightConfig:
         if not 'position' in light_config_file:
             self.emitter_position = "top-center"
         else:
-            self.emitter_position = light_config_file['position']       
+            self.emitter_position = light_config_file['position']
+
+        if 'rotation_axis' in light_config_file:
+            self.emitter_rotation_axis = light_config_file['rotation_axis']
+        else:
+            self.emitter_rotation_axis = [1,0,0]
+
+        if 'rotation_degrees' in light_config_file:
+            self.emitter_rotation_degrees = light_config_file['rotation_degrees']
+        else:
+            self.emitter_rotation_degrees = 0
 
 class ObjectConfig:
     object_idx = 0

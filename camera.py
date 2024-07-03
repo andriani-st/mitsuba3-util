@@ -26,31 +26,73 @@ class Camera:
         else:
             self.rotation_axis = rotation_axis
 
-        if(self.rotation_axis == self.up_axis):
-            if(up_axis == [0,1,0]):
-                self.origin = np.array([camera_target[0],camera_target[1],camera_target[2]+distance])
-                self.side_axis = [1,0,0]
-                self.depth_axis = [0,0,1]
-            elif(up_axis == [1,0,0]):
-                self.origin = np.array([camera_target[0],camera_target[1],camera_target[2]+distance])
-                self.side_axis = [0,1,0]
-                self.depth_axis = [0,0,1]
-            elif(up_axis == [0,0,1]):
-                self.origin = np.array([camera_target[0],camera_target[1]+distance,camera_target[2]])
-                self.side_axis = [1,0,0]
-                self.depth_axis = [0,1,0]
-        else:
-            free_axis = np.array(self.up_axis) + np.array(self.rotation_axis)
-            self.depth_axis = [1-free_axis[0],1-free_axis[1],1-free_axis[2]]
-
-            dummy_axis = np.array(self.depth_axis) + np.array(self.up_axis)
-            self.side_axis = [1-dummy_axis[0],1-dummy_axis[1],1-dummy_axis[2]]
-
-            self.origin = np.array([camera_target[0] + distance*(1-free_axis[0]),camera_target[1] + distance*(1-free_axis[1]),camera_target[2] + distance*(1-free_axis[2])])
-
         self.depth_axis = camera_axis
-        free_axis = np.array(self.up_axis) + np.array(self.depth_axis)
-        self.side_axis = [1-abs(free_axis[0]),1-abs(free_axis[1]),1-abs(free_axis[2])]
+        #free_axis = np.array(self.up_axis) + np.array(self.depth_axis)
+        
+        #self.side_axis = [1-abs(free_axis[0]),1-abs(free_axis[1]),1-abs(free_axis[2])]
+        
+        if(up_axis== [1,0,0]):
+            if(self.depth_axis == [0,1,0]):
+                self.side_axis = [0,0,1]
+            if(self.depth_axis == [0,-1,0]):
+                self.side_axis = [0,0,-1]
+            if(self.depth_axis == [0,0,1]):
+                self.side_axis = [0,-1,0]
+            if(self.depth_axis == [0,0,-1]):
+                self.side_axis = [0,1,0]
+
+        if(up_axis== [-1,0,0]):
+            if(self.depth_axis == [0,1,0]):
+                self.side_axis = [0,0,-1]
+            if(self.depth_axis == [0,-1,0]):
+                self.side_axis = [0,0,1]
+            if(self.depth_axis == [0,0,1]):
+                self.side_axis = [0,1,0]
+            if(self.depth_axis == [0,0,-1]):
+                self.side_axis = [0,-1,0]
+
+        if(up_axis== [0,1,0]):
+            if(self.depth_axis == [1,0,0]):
+                self.side_axis = [0,0,-1]
+            if(self.depth_axis == [-1,0,0]):
+                self.side_axis = [0,0,1]
+            if(self.depth_axis == [0,0,1]):
+                self.side_axis = [1,0,0]
+            if(self.depth_axis == [0,0,-1]):
+                self.side_axis = [-1,0,0]
+            
+        if(up_axis== [0,-1,0]):
+            if(self.depth_axis == [1,0,0]):
+                self.side_axis = [0,0,1]
+            if(self.depth_axis == [-1,0,0]):
+                self.side_axis = [0,0,-1]
+            if(self.depth_axis == [0,0,1]):
+                self.side_axis = [-1,0,0]
+            if(self.depth_axis == [0,0,-1]):
+                self.side_axis = [1,0,0]
+        
+        if(up_axis== [0,0,1]):
+            if(self.depth_axis == [1,0,0]):
+                self.side_axis = [0,1,0]
+            if(self.depth_axis == [-1,0,0]):
+                self.side_axis = [0,-1,0]
+            if(self.depth_axis == [0,1,0]):
+                self.side_axis = [-1,0,0]
+            if(self.depth_axis == [0,-1,0]):
+                self.side_axis = [1,0,0]
+
+        if(up_axis== [0,0,-1]):
+            if(self.depth_axis == [1,0,0]):
+                self.side_axis = [0,-1,0]
+            if(self.depth_axis == [-1,0,0]):
+                self.side_axis = [0,1,0]
+            if(self.depth_axis == [0,1,0]):
+                self.side_axis = [1,0,0]
+            if(self.depth_axis == [0,-1,0]):
+                self.side_axis = [-1,0,0]
+         
+        #print(free_axis)
+        #print(self.side_axis)
 
         self.origin = np.array([camera_target[0]+distance*self.depth_axis[0],camera_target[1]+distance*self.depth_axis[1],camera_target[2]+distance*self.depth_axis[2]])
 

@@ -10,24 +10,23 @@
     "fps": 5,
     "target": "auto",
     "distance": "auto",
-    "distance_from_target_sign": "+",
     "seed": 0,
     "fov": 45,
     "samples_per_pixel": 224,
-    "up_axis": [0,1,0],
-    "camera_axis": [1,0,0],
-    "rotation_axis": [1,0,0],
+    "up_axis": [0,-1,0],
+    "camera_axis": [0,0,-1],
+    "rotation_axis": [0,1,0],
     "add_floor": true,
     "floor_type": "diffuse",
-    "floor_color": [0.5, 0.5, 0.5],
-    "add_background": false,
+    "floor_color": [0.9, 0.5, 0.9],
+    "add_background": true,
     "background_type": "diffuse",
-    "background_color": [0.5, 0.1, 0.3]
+    "background_color": [1, 0.5, 0.5]
   },
   "objects": [
     {
-      "filename": "obj_files/cylinder.obj",
-      "type": "obj",
+      "filename": "cylinder_orderings/curves.txt",
+      "type": "linearcurve",
       "material": {
         "type": "roughmetal"
       }
@@ -36,15 +35,13 @@
   "lights": [
     {
       "emitter_type": "area",
-      "emitter_shape": "sphere",
-      "filename": "",
-      "rotation_axis": [1,0,0],
-      "rotation_degrees": 0,
-      "scale_factor": 0.5,
-      "radiance": 100,
+      "emitter_shape": "rectangle",
+      "position": "top-center",
+      "rotation_axis": [0,1,0],
+      "rotation_degrees": -110,
       "size": "medium",
-      "distance_from_object": "medium",
-      "position": "top-left"
+      "distance_from_object": "small",
+      "radiance": 2
     }
   ]
 }

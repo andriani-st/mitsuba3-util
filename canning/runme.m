@@ -1,14 +1,16 @@
 format compact;
 close all; clear; clc;
-N = 100;
+
 ncanes = 40;
+x_offset = 100;
+pts = [172 8; 163 36; 155 58; 154 67; 180 84; 189 107; 175 133; 148 145; 172 159; 178 173; 178 195; 161 212]'; % mporw na parw tis sintetagmenes tou profil enos symmetrikou antikeimenou (px apo to paint) na ta valw edw kai tha mou ftiaksei to antikeimeno!!!
+
 maxTwist = 60;
+N = 100;
 angles = deg2rad(linspace(0,360,ncanes));
 anglesTwist = deg2rad(linspace(0,maxTwist,N));
 
-folder = '/home/andriani/Documents/Master_thesis/mitsuba3-util/canning/curves_files/5/';
-pts = [172 8; 163 36; 155 58; 154 67; 180 84; 189 107; 175 133; 148 145; 172 159; 178 173; 178 195; 161 212]'; % mporw na parw tis sintetagmenes tou profil enos symmetrikou antikeimenou (px apo to paint) na ta valw edw kai tha mou ftiaksei to antikeimeno!!!
-x_offset = 100;
+folder = 'curves_files/5/';
 
 pts = -pts;
 
