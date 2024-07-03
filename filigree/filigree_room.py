@@ -3,44 +3,37 @@ import numpy as np
 import sys
 import json
 
+sys.path.append('../')
+import variables
+import config as cf
+
 config = sys.argv[1]
 
-with open(config, 'r') as file:
-    data = json.load(file)
+variables.config = cf.Config(config)
 
-use_gpu = True
-if('use_gpu' in data):
-    use_gpu = data['use_gpu']
-
-if(use_gpu):
-    print("Running with cuda...")
+if(variables.config.use_gpu):
     mitsuba.set_variant("cuda_ad_rgb")
 else:
     mitsuba.set_variant("llvm_ad_rgb")
 
-from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T
 
-filigree_path = data['filigree_path']
-
-def load_sensor(fov):
+def load_sensor():
     center, sizes = find_center_of_bounding_box()
 
     return mitsuba.load_dict({
         'type': 'perspective',
-        'fov': data['output']['fov'],
-        'to_world': T.look_at(origin=[center[0],center[1]+max(sizes),center[2]-max(sizes)*1.4], target=center, up=[0, 1, 0]),
-        'principal_point_offset_x': 0,  #normalized principal point, [0,0] -> center of image
-        'principal_point_offset_y': 0,
+        'fov': variables.config.fov,
+        'to_world': T.look_at(origin=[center[0],center[1]+max(sizes)/2,center[2]-max(sizes)*1.5], target=center, up=[0, 1, 0]),
         'sampler': {
             'type': 'multijitter',
             'sample_count': 16,
-            'seed': data['output']['seed']
+            'seed': variables.config.seed
         },
         'film': {
             'type': 'hdrfilm',
-            'width': data['output']['width'],
-            'height': data['output']['height'],
+            'width': variables.config.width,
+            'height': variables.config.height,
             'rfilter': {
                 'type': 'tent',
             },
@@ -48,15 +41,7 @@ def load_sensor(fov):
         },
     })
 
-def load_scene(light_radiance=1, constant_radiance=0, add_floor = True, add_object=True):
-
-    center, sizes = find_center_of_bounding_box()
-    side = 200
-    room_x = sizes[0]
-    room_y = sizes[2]*2
-    height = 1000
-    print(sizes)
-
+def load_scene_lights(light_radiance, center, sizes, height):
     my_scene = {
         'type': 'scene',
         'id': 'my_scene',
@@ -137,117 +122,106 @@ def load_scene(light_radiance=1, constant_radiance=0, add_floor = True, add_obje
         },
     }
 
-    if(add_object):
+    return my_scene
 
-        object = {
-            'type': 'obj',
-            'filename': filigree_path,
-            'to_world': T.rotate([1,0,0],-90),
-            'bsdf': {
-                'type': 'conductor',
-                'material': 'Al',
-                #'distribution': 'ggx',
-                #'alpha_u': 0.1,
-                #'alpha_v': 0.1
-                #'reflectance': {
-                #    'type': 'rgb',
-                #    'value': [0.2, 0.2, 0.2]
-                #}
-            },
+def load_scene(light_radiance=10):
+
+    center, sizes = find_center_of_bounding_box()
+    room_x = sizes[0]
+    room_y = sizes[2]*2
+    height = max(sizes)
+
+    my_scene = load_scene_lights(light_radiance, center, sizes, height)
+
+    object = {
+        'type': 'obj',
+        'filename': variables.config.filigree_path,
+        'to_world': T.rotate([1,0,0],-90),
+        'bsdf': {
+            'type': 'conductor',
+            'material': 'Al'
+        },
+    }
+    my_scene['skeleton'] = object
+
+    floor = {
+        'type': 'rectangle',
+        'to_world': T.translate([center[0],center[1]-sizes[1],center[2]]).rotate([1,0,0],-90).scale([room_x,room_y,1]),
+        
+        'bsdf': {
+            'type': 'diffuse',
+            'reflectance': {
+                'type': 'checkerboard',
+                "to_uv": T.scale([10, 10, 0])
+            }
         }
-        my_scene['skeleton'] = object
+    }
+    my_scene['floor'] = floor
 
-    if(constant_radiance != 0):
-        constant_lighting = {
-            'type': 'constant',
-            'radiance': {
+    ceiling = {
+        'type': 'rectangle',
+        'to_world': T.translate([center[0],center[1]+height,center[2]]).rotate([1,0,0],90).scale([room_x,room_y,1]),
+        'bsdf': {
+            'type': 'diffuse',
+            'reflectance': {
                 'type': 'rgb',
-                'value': constant_radiance
-            } 
-        }
-        my_scene['constant_lighting'] = constant_lighting
-
-    if(add_floor):
-        floor = {
-            'type': 'rectangle',
-            'to_world': T.translate([center[0],center[1]-sizes[1],center[2]]).rotate([1,0,0],-90).scale([room_x,room_y,1]),
-            
-            'bsdf': {
-                'type': 'diffuse',
-                'reflectance': {
-                    'type': 'checkerboard',
-                    "to_uv": T.scale([10, 10, 0])
-                    #'value': [0.1, 0.25, 0.3]
-                }
+                'value': [0.8, 0.8, 0.8]
             }
         }
-        my_scene['floor'] = floor
+    }
+    my_scene['ceiling'] = ceiling
 
-    if(1):
-        ceiling = {
-            'type': 'rectangle',
-            'to_world': T.translate([center[0],center[1]+height,center[2]]).rotate([1,0,0],90).scale([room_x,room_y,1]),
-            'bsdf': {
-                'type': 'diffuse',
-                'reflectance': {
-                    'type': 'rgb',
-                    'value': [0.8, 0.8, 0.8]
-                }
+    back_wall = {
+        'type': 'rectangle',
+        'to_world': T.translate([center[0],center[1],center[2]+room_y]).rotate([1,0,0],-180).scale([room_x,height,1]),
+        'bsdf': {
+            'type': 'diffuse',
+            'reflectance': {
+                'type': 'rgb',
+                'value': [0.8, 0.8, 0.8]
             }
         }
-        my_scene['ceiling'] = ceiling
+    }
+    my_scene['back_wall'] = back_wall
 
-        back_wall = {
-            'type': 'rectangle',
-            'to_world': T.translate([center[0],center[1],center[2]+room_y]).rotate([1,0,0],-180).scale([room_x,height,1]),
-            'bsdf': {
-                'type': 'diffuse',
-                'reflectance': {
-                    'type': 'rgb',
-                    'value': [0.8, 0.8, 0.8]
-                }
+    side_wall1 = {
+        'type': 'rectangle',
+        'to_world': T.translate([center[0]+room_x,center[1],center[2]]).rotate([1,0,0],-180).rotate([0,1,0],-90).scale([room_y,height,1]),
+        'bsdf': {
+            'type': 'diffuse',
+            'reflectance': {
+                'type': 'rgb',
+                'value': [0.8, 0.8, 0.8]
             }
         }
-        my_scene['back_wall'] = back_wall
+    }
+    my_scene['side_wall1'] = side_wall1
 
-        side_wall1 = {
-            'type': 'rectangle',
-            'to_world': T.translate([center[0]+room_x,center[1],center[2]]).rotate([1,0,0],-180).rotate([0,1,0],-90).scale([room_y,height,1]),
-            'bsdf': {
-                'type': 'diffuse',
-                'reflectance': {
-                    'type': 'rgb',
-                    'value': [0.8, 0.8, 0.8]
-                }
+    side_wall2 = {
+        'type': 'rectangle',
+        'to_world': T.translate([center[0]-room_x,center[1],center[2]]).rotate([1,0,0],-180).rotate([0,1,0],90).scale([room_y,height,1]),
+        'bsdf': {
+            'type': 'diffuse',
+            'reflectance': {
+                'type': 'rgb',
+                'value': [0.8, 0.8, 0.8]
             }
         }
-        my_scene['side_wall1'] = side_wall1
+    }
+    my_scene['side_wall2'] = side_wall2
 
-        side_wall2 = {
-            'type': 'rectangle',
-            'to_world': T.translate([center[0]-room_x,center[1],center[2]]).rotate([1,0,0],-180).rotate([0,1,0],90).scale([room_y,height,1]),
-            'bsdf': {
-                'type': 'diffuse',
-                'reflectance': {
-                    'type': 'rgb',
-                    'value': [0.8, 0.8, 0.8]
-                }
+    front_wall = {
+        'type': 'rectangle',
+        'to_world': T.translate([center[0],center[1],center[2]-room_y]).rotate([1,0,0],360).scale([room_x,height,1]),
+        'bsdf': {
+            'type': 'diffuse',
+            'reflectance': {
+                'type': 'rgb',
+                'value': [0.8, 0.8, 0.8]
             }
         }
-        my_scene['side_wall2'] = side_wall2
-
-        front_wall = {
-            'type': 'rectangle',
-            'to_world': T.translate([center[0],center[1],center[2]-room_y]).rotate([1,0,0],360).scale([room_x,height,1]),
-            'bsdf': {
-                'type': 'diffuse',
-                'reflectance': {
-                    'type': 'rgb',
-                    'value': [0.8, 0.8, 0.8]
-                }
-            }
-        }
-        my_scene['front_wall'] = front_wall
+    }
+    my_scene['front_wall'] = front_wall
 
     return mitsuba.load_dict(my_scene)
 
@@ -262,7 +236,7 @@ def find_center_of_bounding_box():
         },
         'skeleton': {
             'type': 'obj',
-            'filename': filigree_path,
+            'filename': variables.config.filigree_path,
             'to_world': T.rotate([1,0,0],-90)
         }
     }
@@ -280,11 +254,14 @@ def find_center_of_bounding_box():
     return center, [size_x, size_y, size_z]
 
 def main():
-    sensor = load_sensor(45)
+    sensor = load_sensor()
 
-    scene = load_scene(light_radiance=10, constant_radiance=0, add_floor=True, add_object=True)
-    image = mitsuba.render(scene, spp=data['output']['samples_per_pixel'], sensor=sensor)
-    mitsuba.util.write_bitmap("result" + ".png", image)
+    scene = load_scene(light_radiance=variables.config.room_lights_radiance)
+    image = mitsuba.render(scene, spp=variables.config.samples_per_pixel, sensor=sensor)
+    if(variables.config.results_folder == ""):
+        mitsuba.util.write_bitmap("result" + ".png", image)
+    else:
+        mitsuba.util.write_bitmap(variables.config.results_folder + "/result" + ".png", image)
     
     
 if __name__ == "__main__":
