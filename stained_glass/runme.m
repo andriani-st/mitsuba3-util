@@ -1,8 +1,12 @@
 format compact
 close all; clear; clc;
 
-I = double(imread('image2.jpg'));%/255;
-R = double(imread('image2.jpg'));
+image_filename = 'image.jpg';
+n = 500;
+distortionFactor = 0.1;
+
+I = double(imread(image_filename));%/255;
+R = double(imread(image_filename));
 
 
 % Get the size of the image
@@ -15,8 +19,6 @@ piecesEdges = [];
 numPoints = size(skeletonPoints,1);
 numOuterSkeletonPoints = size(skeletonPoints,1);
 
-n = 500;
-distortionFactor = 0;
 x = round(1 + rand([1 n]) * (size(I,2)-2));
 y = round(1 + rand([1 n]) * (size(I,1)-2));
 [vx,vy] = voronoi(x,y);
@@ -149,14 +151,14 @@ for i = 1:n
 end
 
 %%
-figure; plot(skeletonPoints(:,2), skeletonPoints(:,1), 'ro', 'MarkerSize',1);
+%figure; plot(skeletonPoints(:,2), skeletonPoints(:,1), 'ro', 'MarkerSize',1);
 
 constrainedEdges = [frameEdges; piecesEdges];
 dt = delaunayTriangulation(skeletonPoints(:,2),skeletonPoints(:,1), piecesEdges);
 
 triangulationVertices = dt.Points;
 triangulationFaces = dt.ConnectivityList;
-figure; imshow(binaryImage'); hold on; scatter(triangulationVertices(:, 1), triangulationVertices(:, 2), 10, 'b', 'filled');
+%figure; imshow(binaryImage'); hold on; scatter(triangulationVertices(:, 1), triangulationVertices(:, 2), 10, 'b', 'filled');
 %patch('Vertices', triangulationVertices, 'Faces', triangulationFaces, 'FaceColor', 'none', 'EdgeColor', 'b');
 %hold off;
 
@@ -181,13 +183,13 @@ patch('Vertices', triangulationVertices, 'Faces', triangulationFaces(facesOutsid
 
 newFaces = triangulationFaces(facesOutsideWhite, :);
 % Display the new triangulation
-figure;
-trisurf(newFaces, triangulationVertices(:, 1), triangulationVertices(:, 2), zeros(size(triangulationVertices, 1), 1), 'FaceColor', 'interp', 'EdgeColor', 'k');
-axis equal;
-title('Triangulation without Vertices in White Regions');
+%figure;
+%trisurf(newFaces, triangulationVertices(:, 1), triangulationVertices(:, 2), zeros(size(triangulationVertices, 1), 1), 'FaceColor', 'interp', 'EdgeColor', 'k');
+%axis equal;
+%title('Triangulation without Vertices in White Regions');
 
-figure;
-triplot(dt, 'b', 'LineWidth', 2);
+%figure;
+%triplot(dt, 'b', 'LineWidth', 2);
 
 skeletonV = [triangulationVertices zeros(size(triangulationVertices,1),1)];
 skeletonV = [skeletonV; [triangulationVertices ones(size(triangulationVertices,1),1)*30]];
@@ -229,17 +231,17 @@ vertex_normals_skeleton = vertex_normals_skeleton ./ vecnorm(vertex_normals_skel
 vertex_normals_skeleton(1:size(vertex_normals_skeleton)/2,:) = -vertex_normals_skeleton(1:size(vertex_normals_skeleton)/2,:);
 
 % Plot the mesh with vertex normals
-figure; view(3); rotate3d('on')
-trisurf(skeletonF, skeletonV(:, 1), skeletonV(:, 2), skeletonV(:, 3), 'FaceColor', 'cyan');
-hold on;
-quiver3(skeletonV(:, 1), skeletonV(:, 2), skeletonV(:, 3), ...
-    vertex_normals_skeleton(:, 1), vertex_normals_skeleton(:, 2), vertex_normals_skeleton(:, 3), 'r');
-hold off;
-axis equal;
-xlabel('X');
-ylabel('Y');
-zlabel('Z');
-title('Mesh with Vertex Normals');
+%figure; view(3); rotate3d('on')
+%trisurf(skeletonF, skeletonV(:, 1), skeletonV(:, 2), skeletonV(:, 3), 'FaceColor', 'cyan');
+%hold on;
+%quiver3(skeletonV(:, 1), skeletonV(:, 2), skeletonV(:, 3), ...
+%    vertex_normals_skeleton(:, 1), vertex_normals_skeleton(:, 2), vertex_normals_skeleton(:, 3), 'r');
+%hold off;
+%axis equal;
+%xlabel('X');
+%ylabel('Y');
+%zlabel('Z');
+%title('Mesh with Vertex Normals');
 
 skeletonF = [skeletonF; newFaces];
 
@@ -255,18 +257,4 @@ fprintf(fileObjs, 'vn %f %f %f\n', vertex_normals_skeleton');
 fprintf(fileObjs, '# Faces\n');
 fprintf(fileObjs, 'f %d//%d %d//%d %d//%d\n', [skeletonF, skeletonF]');
 
-
-%%
-
-% % Plot the mesh with vertex normals
-% figure; view(3); rotate3d('on')
-% trisurf(faces, vertices(:, 1), vertices(:, 2), vertices(:, 3), 'FaceColor', 'cyan');
-% hold on;
-% quiver3(vertices(:, 1), vertices(:, 2), vertices(:, 3), ...
-%     vertex_normals(:, 1), vertex_normals(:, 2), vertex_normals(:, 3), 'r');
-% hold off;
-% axis equal;
-% xlabel('X');
-% ylabel('Y');
-% zlabel('Z');
-% title('Mesh with Vertex Normals');
+close all; clear; clc;

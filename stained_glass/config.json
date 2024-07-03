@@ -1,0 +1,17 @@
+{
+  "use_gpu": true,
+  "stained_glass_files": {
+    "tiles_path": "example_files/1/tiles/",
+    "skeleton_path": "example_files/1/skeleton.obj",
+    "colors_path": "example_files/1/colors.txt"
+  },
+  "lights_radiance": 10,
+  "output": {
+    "fov": 45,
+    "results_folder": "",
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 224,
+    "seed": 0
+  }
+}
