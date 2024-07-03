@@ -18,13 +18,15 @@ else:
 
 from mitsuba import ScalarTransform4f as T
 
+camera_offset_y_axis_multiplier = 1/2 
+camera_offset_z_axis_multiplier = 1.5
 def load_sensor():
     center, sizes = find_center_of_bounding_box()
 
     return mitsuba.load_dict({
         'type': 'perspective',
         'fov': variables.config.fov,
-        'to_world': T.look_at(origin=[center[0],center[1]+max(sizes)/2,center[2]-max(sizes)*1.5], target=center, up=[0, 1, 0]),
+        'to_world': T.look_at(origin=[center[0],center[1]+max(sizes)*camera_offset_y_axis_multiplier,center[2]-max(sizes)*camera_offset_z_axis_multiplier], target=center, up=[0, 1, 0]),
         'sampler': {
             'type': 'multijitter',
             'sample_count': 16,
