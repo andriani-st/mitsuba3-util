@@ -1,7 +1,16 @@
 format compact
 close all; clear; clc;
 
-I = double(imread('pattern.jpg'))/255;
+%% Get input image & output folder
+[filename, pathname] = uigetfile({'*.jpg;*.png', 'Image Files (*.jpg, *.png)'}, 'Select pattern image');
+
+if (filename == 0) % cancel pressed
+    return;
+end  
+
+image_filename = char(sprintf("%s%s",pathname,filename));
+
+I = double(imread(image_filename))/255;
 grayImg = rgb2gray(I);
 binaryImg = imbinarize(grayImg);
 
