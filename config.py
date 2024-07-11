@@ -178,7 +178,7 @@ class Config:
         objects_json = data['objects']
         self.objects = []
         for object_config in objects_json:
-            if 'filename' in object_config and os.path.isdir(object_config['filename']):
+            if 'filename' in object_config and os.path.isdir(object_config['filename']) and not self.output_type=="animation_video" :
                 if 'colors_filename' in object_config:
                     colors = []
                     with open(object_config['colors_filename'], 'r') as file:

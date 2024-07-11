@@ -2,15 +2,18 @@
   "output": {
     "type": "animation_video",
     "rotation_axis": [0,1,0],
-    "rotation_degrees": 360,
+    "rotation_degrees": 0,
     "rotation_step":10,
     "fov": 45,
+    "target": [50,0,0], 
+    "distance": 195,
     "up_axis": [0,1,0],
+    "camera_axis": [0,0,1],
     "width": 512,
     "height": 512,
     "samples_per_pixel": 1024,
-    "add_floor": true,
-    "add_background": false,
+    "add_floor": false,
+    "add_background": true,
     "results_folder": ""
   },
   "objects": [
@@ -19,7 +22,7 @@
       "filename": "animation_files/01_cutting/3d_out/material/",
       "type":"obj",
       "material": {
-        "type": "metal"
+        "type": "roughmetal"
       }
     },
     {

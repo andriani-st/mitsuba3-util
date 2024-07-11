@@ -5,3 +5,4 @@ envmaps/
 *.jpg
 *.pyc
 *.ply
+*.obj
