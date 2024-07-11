@@ -37,4 +37,4 @@ python3 util.py /path/to/folder/containing/multiple/json/files/
 
 ## User manual
 
-The user manual can be found here: https://github.com/andriani-st/mitsuba3-util/blob/main/user_manual_v_02.pdf
+The user manual can be found here: https://github.com/andriani-st/mitsuba3-util/blob/main/user_manual_v_03.pdf
