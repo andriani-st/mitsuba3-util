@@ -10,15 +10,25 @@ class Config:
         with open(config_file, 'r') as file:
             data = json.load(file) 
 
+        if('disable_cpu_parallelization' in data):
+            self.disable_cpu_parallelization = data['disable_cpu_parallelization']
+        else:
+            self.disable_cpu_parallelization = False
+
         if('use_gpu' in data):
             self.use_gpu = data['use_gpu']
             if(self.use_gpu == True):
                 print(Fore.CYAN + "Running using cuda enabled" + Style.RESET_ALL)
             else:
-                print(Fore.CYAN + "Running on CPU only enabled" + Style.RESET_ALL)
+                if(self.disable_cpu_parallelization == False):
+                    print(Fore.CYAN + "Running on CPU only enabled (parallelization on)" + Style.RESET_ALL)
+                else:
+                    print(Fore.CYAN + "Running on CPU only enabled (parallelization off)" + Style.RESET_ALL)
         else:
             self.use_gpu = True
             print(Fore.CYAN + "Running using cuda enabled \n" + Style.RESET_ALL + "(If you want to run on CPU instead set 'use_gpu' field to false in the configuration file)")
+        
+        
         
         if('lights_radiance' in data):
             self.room_lights_radiance = data['lights_radiance']

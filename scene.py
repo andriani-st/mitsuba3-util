@@ -16,7 +16,10 @@ from object import Object
 if(config.use_gpu):
     mitsuba.set_variant("cuda_ad_rgb")
 else:
-    mitsuba.set_variant("llvm_ad_rgb")
+    if(config.disable_cpu_parallelization == True):
+        mitsuba.set_variant("scalar_rgb")
+    else:
+        mitsuba.set_variant("llvm_ad_rgb")
 
 from matplotlib import pyplot as plt
 from mitsuba import ScalarTransform4f as T

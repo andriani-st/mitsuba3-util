@@ -1,4 +1,6 @@
 {
+  "use_gpu": false,
+  "disable_cpu_parallelization": true,
   "output": {
     "type": "rotation_video",
     "rotation_axis": [0,0,1],

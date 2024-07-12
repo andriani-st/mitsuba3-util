@@ -6,7 +6,10 @@ from variables import *
 if(config.use_gpu):
     mitsuba.set_variant("cuda_ad_rgb")
 else:
-    mitsuba.set_variant("llvm_ad_rgb")
+    if(config.disable_cpu_parallelization == True):
+        mitsuba.set_variant("scalar_rgb")
+    else:
+        mitsuba.set_variant("llvm_ad_rgb")
 
 from mitsuba import ScalarTransform4f as T
 
@@ -14,7 +17,7 @@ class Camera:
     def __init__(self, fov, distance, camera_target, up_axis = np.array([0,1,0]), width = 512, height = 512, spp = 224, seed=0, rotation_axis = [0,0,0], camera_axis=np.array([0,0,1])):
         self.fov = fov
         self.up_axis = up_axis
-        
+
         self.camera_target = np.array(camera_target)
         self.width = width
         self.height = height
