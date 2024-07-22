@@ -13,8 +13,8 @@
     "seed": 0,
     "fov": 45,
     "samples_per_pixel": 224,
-    "up_axis": [0,-1,0],
-    "camera_axis": [0,0,-1],
+    "up_axis": [0,0,1],
+    "camera_axis": [0,1,0],
     "rotation_axis": [0,1,0],
     "add_floor": true,
     "floor_type": "diffuse",
@@ -25,10 +25,14 @@
   },
   "objects": [
     {
-      "filename": "cylinder_orderings/curves.txt",
-      "type": "linearcurve",
+      "filename": "obj_files/cylinder.obj",
+      "type": "obj",
       "material": {
-        "type": "roughmetal"
+        "type": "diffuse",
+        "reflectance": {
+            "type": "bitmap",
+            "filename": "textures/wood.jpg"
+        }
       }
     }
   ],
@@ -41,7 +45,7 @@
       "rotation_degrees": -110,
       "size": "medium",
       "distance_from_object": "small",
-      "radiance": 2
+      "radiance": 10
     }
   ]
 }

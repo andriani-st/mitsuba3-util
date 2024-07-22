@@ -35,9 +35,6 @@ class Object:
     elif data.material_type == 'roughmetal':
       self.material = {'type': 'roughconductor', 'material': data.metal_type, 'distribution': 'ggx', 'alpha_u': data.material_alpha, 'alpha_v': data.material_alpha}
     
-    elif data.material_type == "diffuse":
-      self.material = {'type': 'diffuse'}
-    
     else:
       self.material = data.material
  
