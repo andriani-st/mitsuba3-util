@@ -5,6 +5,8 @@ class Object:
     self.name = data.name
     self.filename = data.filename
     self.type = data.type
+    self.rotation_axis = data.rotation_axis
+    self.rotation_degrees = data.rotation_degrees
 
     if data.material_type == 'glass':
       if data.material_color == "auto":

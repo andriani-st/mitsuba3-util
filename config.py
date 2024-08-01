@@ -292,6 +292,16 @@ class ObjectConfig:
         else:
             self.type = object_config_file['type']
 
+        if not 'rotation_axis' in object_config_file:
+            self.rotation_axis = [1,0,0]
+        else:
+            self.rotation_axis = object_config_file['rotation_axis']
+
+        if not 'rotation_degrees' in object_config_file:
+            self.rotation_degrees = 0
+        else:
+            self.rotation_degrees = object_config_file['rotation_degrees']
+
         if not 'material' in object_config_file:
             raise SystemExit(Fore.RED + "ERROR: Required json object 'material' is missing from object in 'objects" + Style.RESET_ALL)
         else:

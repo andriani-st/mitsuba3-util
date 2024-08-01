@@ -227,7 +227,8 @@ class Scene:
             object_dict = {
                 'type': object.type,
                 'filename': object.filename,
-                'bsdf': object.material
+                'bsdf': object.material,
+                'to_world': T.rotate(object.rotation_axis, object.rotation_degrees),
             }
             my_scene[object.name] = object_dict
 
@@ -341,7 +342,7 @@ class Scene:
             distances = light.emitter_distance_from_object
 
         if(light.emitter_position != "bottom-center-back" and isinstance(light.emitter_position, str) and light.emitter_shape == "rectangle"):
-            print(Fore.LIGHTYELLOW_EX + "Warning:" + light.emitter_position + " position not supported for rectange, setting to bottom-center-back" + Style.RESET_ALL)
+            print(Fore.LIGHTYELLOW_EX + "Warning:" + light.emitter_position + " position not supported for rectangle, setting to bottom-center-back" + Style.RESET_ALL)
             light.emitter_position = "bottom-center-back"
 
         #Position of light

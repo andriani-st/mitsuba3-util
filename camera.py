@@ -124,7 +124,7 @@ class Camera:
 
         return new_camera_origin
     
-    def load_sensor(self, angle=0):
+    def load_sensor(self, angle=0.0):
         return mitsuba.load_dict({
             'type': 'perspective',
             'fov': self.fov,

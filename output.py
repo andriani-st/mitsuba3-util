@@ -2,6 +2,7 @@ import os
 import re
 import copy
 import mitsuba
+import numpy as np
 from config import ObjectConfig
 from variables import *
 
@@ -44,11 +45,14 @@ class RotationVideo(Output):
         step = config.rotation_step
         degrees = config.rotation_degrees
         objects = []
-        for i in range(0, degrees, step):
+        frame_idx = 1
+        for i in np.arange(0, degrees, step):
+            print("Rendering frame " + str(frame_idx) + " out of " + str(int(degrees/step)))
             scene = Scene(objects)
             image = mitsuba.render(scene.load_scene(), spp=scene.camera.samples_per_pixel, sensor=scene.camera.load_sensor(i))
 
             mitsuba.util.write_bitmap(self.results_folder + result_frames_folder + str(i) + ".png", image)
+            frame_idx += 1
 
 class AnimationVideo(Output):
     def __init__(self, results_folder, result_frames_folder, result_video_name, angle=0):

@@ -5,7 +5,8 @@
     "rotation_degrees": 360,
     "rotation_step":10,
     "fov": 45,
-    "up_axis": [0,0,1],
+    "up_axis": [0,1,0],
+    "camera_axis": [0,0,1],
     "width": 512,
     "height": 512,
     "samples_per_pixel": 224,
@@ -15,9 +16,10 @@
   },
   "objects": [
     {
-      "name": "curves",
-      "filename": "obj_files/cylinder.obj",
-      "type":"obj",
+      "filename": "obj_files/mug.ply",
+      "type":"ply",
+      "rotation_axis": [0,0,1],
+      "rotation_degrees": 60,
       "material": {
         "type": "glass",
         "color": [0.871, 0.804, 0.961]
