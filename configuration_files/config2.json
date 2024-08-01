@@ -12,7 +12,8 @@
     "samples_per_pixel": 224,
     "add_floor": true,
     "add_background": false,
-    "results_folder": ""
+    "results_folder": "",
+    "results_filename": "test.png"
   },
   "objects": [
     {

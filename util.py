@@ -7,7 +7,6 @@ import config as cf
 from colorama import Fore, Back, Style
 
 def main():
-
     folder_json_path = sys.argv[1]
     if(os.path.isfile(folder_json_path)):
         json_files = [folder_json_path]
@@ -26,8 +25,13 @@ def main():
         import output
         
         if variables.config.output_type == "animation_video":
-            output.AnimationVideo(variables.config.results_folder, "frames" + str(i) + "/", "video.avi", variables.config.rotation_degrees)
-            video=cv.VideoWriter(variables.config.results_folder + "video" + str(i) + ".avi", cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.width))
+            if variables.config.results_name == "":
+                results_name = "video.avi"
+            else:
+                results_name = variables.config.results_name
+
+            output.AnimationVideo(variables.config.results_folder, "frames" + str(i) + "/", results_name, variables.config.rotation_degrees)
+            video=cv.VideoWriter(variables.config.results_folder + results_name, cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.width))
             
             folder_path = variables.config.results_folder + "frames" + str(i) + "/"
 
@@ -42,8 +46,13 @@ def main():
             video.release()
         
         elif variables.config.output_type == "rotation_video":
-            output.RotationVideo(variables.config.results_folder, "frames" + str(i) + "/", "video" + str(i) + ".avi")
-            video=cv.VideoWriter(variables.config.results_folder + "video" + str(i) + ".avi", cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.width))
+            if variables.config.results_name == "":
+                results_name = "video.avi"
+            else:
+                results_name = variables.config.results_name
+
+            output.RotationVideo(variables.config.results_folder, "frames" + str(i) + "/", results_name)
+            video=cv.VideoWriter(variables.config.results_folder + results_name, cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.width))
             
             folder_path = variables.config.results_folder + "frames" + str(i) + "/"
 
@@ -58,7 +67,12 @@ def main():
             video.release()
         
         elif variables.config.output_type == "image":
-            output.ImageOutput(variables.config.results_folder, str(i) + ".png", variables.config.rotation_degrees)
+            if variables.config.results_name == "":
+                results_name = "result.png"
+            else:
+                results_name = variables.config.results_name
+                
+            output.ImageOutput(variables.config.results_folder, results_name, variables.config.rotation_degrees)
     
 if __name__ == "__main__":
     start_time = time.time()

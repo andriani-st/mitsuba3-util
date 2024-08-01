@@ -74,6 +74,11 @@ class Config:
         else:
             self.results_folder = output['results_folder']
 
+        if not 'results_filename' in output:
+            self.results_name = ""
+        else:
+            self.results_name = output['results_filename']
+
         if not 'rotation_degrees' in output:
             if output["type"] == "rotation_video":
                 self.rotation_degrees = 360
