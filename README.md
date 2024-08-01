@@ -17,6 +17,12 @@ pip install mitsuba
 ```
 pip install opencv-python
 ```
+
+-Various Python libraries
+```
+pip install -r requirements.txt
+```
+
 - MATLAB
 
 ## Running the util
@@ -29,11 +35,6 @@ python3 util.py /path/to/json/file/config.json
 
 > Renders image/video using config.json
 
-or
-
-```
-python3 util.py /path/to/folder/containing/multiple/json/files/
-```
 
 ## User manual
 
