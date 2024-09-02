@@ -7,6 +7,9 @@ class Object:
     self.type = data.type
     self.rotation_axis = data.rotation_axis
     self.rotation_degrees = data.rotation_degrees
+    self.x_rotation_degrees = data.x_rotation_degrees
+    self.y_rotation_degrees = data.y_rotation_degrees
+    self.z_rotation_degrees = data.z_rotation_degrees
 
     if data.material_type == 'glass':
       if data.material_color == "auto":

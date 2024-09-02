@@ -112,6 +112,11 @@ class Config:
         else:
             self.target = output['target']
 
+        if not 'origin' in output:
+            self.origin = "auto"
+        else:
+            self.origin = output['origin']
+
         if not 'distance' in output:
             self.distance = "auto"
         else:
@@ -146,6 +151,22 @@ class Config:
             self.rotation_axis = [0,0,1]
         else:
             self.rotation_axis = output['rotation_axis']
+
+        if not 'x_rotation_degrees' in output:
+            self.x_rotation_degrees = 0
+        else:
+            self.x_rotation_degrees = output['x_rotation_degrees'] 
+
+        if not 'y_rotation_degrees' in output:
+            self.y_rotation_degrees = 0
+        else:
+            self.y_rotation_degrees = output['y_rotation_degrees'] 
+
+        if not 'z_rotation_degrees' in output:
+            self.z_rotation_degrees = 0
+        else:
+            self.z_rotation_degrees = output['z_rotation_degrees'] 
+
 
         if not 'add_floor' in output:
             self.add_floor = True
@@ -306,6 +327,21 @@ class ObjectConfig:
             self.rotation_degrees = 0
         else:
             self.rotation_degrees = object_config_file['rotation_degrees']
+
+        if not 'x_rotation_degrees' in object_config_file:
+            self.x_rotation_degrees = 0
+        else:
+            self.x_rotation_degrees = object_config_file['x_rotation_degrees'] 
+
+        if not 'y_rotation_degrees' in object_config_file:
+            self.y_rotation_degrees = 0
+        else:
+            self.y_rotation_degrees = object_config_file['y_rotation_degrees'] 
+
+        if not 'z_rotation_degrees' in object_config_file:
+            self.z_rotation_degrees = 0
+        else:
+            self.z_rotation_degrees = object_config_file['z_rotation_degrees'] 
 
         if not 'material' in object_config_file:
             raise SystemExit(Fore.RED + "ERROR: Required json object 'material' is missing from object in 'objects" + Style.RESET_ALL)

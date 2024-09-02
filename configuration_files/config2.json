@@ -2,36 +2,37 @@
   "output": {
     "type": "image",
     "rotation_axis": [0,0,1],
-    "rotation_degrees": 360,
+    "rotation_degrees": 0,
     "rotation_step":10,
     "fov": 45,
     "up_axis": [0,1,0],
     "camera_axis": [0,0,1],
+    "distance": 20,
     "width": 512,
     "height": 512,
     "samples_per_pixel": 224,
     "add_floor": true,
     "add_background": false,
     "results_folder": "",
-    "results_filename": "test.png"
+    "results_filename": "test2.png"
   },
   "objects": [
     {
-      "filename": "obj_files/mug.ply",
-      "type":"ply",
-      "rotation_axis": [0,0,1],
-      "rotation_degrees": 60,
+      "filename": "obj_files/standing_angel.obj",
+      "type":"obj",
+      "x_rotation_degrees": -30,
+      "y_rotation_degrees": 30,
+      "z_rotation_degrees": 20,
       "material": {
-        "type": "glass",
-        "color": [0.871, 0.804, 0.961]
+        "type": "plastic"
       }
     }
   ],
   "lights": [
     {
-      "name": "light2",
+      "name": "light",
       "emitter_type": "envmap",
-      "filename":"envmaps/christmas_photo_studio_4k_resized.hdr"
+      "filename": "envmaps/carpentry_shop_01_4k_resized.hdr"
     }
   ]
 }

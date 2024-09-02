@@ -97,7 +97,10 @@ class Camera:
         #print(free_axis)
         #print(self.side_axis)
 
-        self.origin = np.array([camera_target[0]+distance*self.depth_axis[0],camera_target[1]+distance*self.depth_axis[1],camera_target[2]+distance*self.depth_axis[2]])
+        if config.origin != "auto":
+            self.origin = config.origin
+        else:
+            self.origin = np.array([camera_target[0]+distance*self.depth_axis[0],camera_target[1]+distance*self.depth_axis[1],camera_target[2]+distance*self.depth_axis[2]])
 
     def rotate_camera_origin(self, angle):
         theta = np.radians(angle)
@@ -125,10 +128,23 @@ class Camera:
         return new_camera_origin
     
     def load_sensor(self, angle=0.0):
+        transform = T.look_at(origin=self.rotate_camera_origin(angle), target=self.camera_target, up=self.up_axis)
+
+        # Rotation around X-axis (30 degrees)
+        rotation_x = T.rotate(axis=[1, 0, 0], angle=config.x_rotation_degrees)
+
+        # Rotation around Y-axis (45 degrees)
+        rotation_y = T.rotate(axis=[0, 1, 0], angle=config.y_rotation_degrees)
+
+        # Rotation around Z-axis (60 degrees)
+        rotation_z = T.rotate(axis=[0, 0, 1], angle=config.z_rotation_degrees)
+
+        combined_rotation = rotation_z @ rotation_y @ rotation_x
+
         return mitsuba.load_dict({
             'type': 'perspective',
             'fov': self.fov,
-            'to_world': T.look_at(origin=self.rotate_camera_origin(angle), target=self.camera_target, up=self.up_axis),
+            'to_world': combined_rotation @ transform,
             'principal_point_offset_x': 0,  #normalized principal point, [0,0] -> center of image
             'principal_point_offset_y': 0,
             'sampler': {

@@ -224,11 +224,17 @@ class Scene:
         }
 
         for object in self.objects:
+            rotation_x = T.rotate(axis=[1, 0, 0], angle=object.x_rotation_degrees)
+            rotation_y = T.rotate(axis=[0, 1, 0], angle=object.y_rotation_degrees)
+            rotation_z = T.rotate(axis=[0, 0, 1], angle=object.z_rotation_degrees)
+
+            combined_rotation = rotation_z @ rotation_y @ rotation_x
+            
             object_dict = {
                 'type': object.type,
                 'filename': object.filename,
                 'bsdf': object.material,
-                'to_world': T.rotate(object.rotation_axis, object.rotation_degrees),
+                'to_world': combined_rotation
             }
             my_scene[object.name] = object_dict
 
