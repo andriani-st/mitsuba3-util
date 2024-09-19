@@ -1,3 +1,5 @@
+**This repository contains software that serves as part of the requirements for my Master's thesis at the University of Crete. The software is also part of the “Craeft” Research and Innovation Action, funded by the European Commission under the Horizon Europe programme (Grant Agreement No. 101094349).**
+
 # mitsuba3-util
 
 The purpose of mitsuba3-util is to simplify the use of mitsuba3 for rendering images and extend its output options. 
@@ -39,3 +41,6 @@ python3 util.py /path/to/json/file/config.json
 ## User manual
 
 The user manual can be found here: https://github.com/andriani-st/mitsuba3-util/blob/main/user_manual_v_03.pdf
+
+
+
