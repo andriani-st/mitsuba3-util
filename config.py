@@ -2,6 +2,7 @@ import json
 from colorama import Fore, Back, Style
 import os
 import copy
+import numpy as np
 
 class Config:
     def __init__(self, config_file):
@@ -137,35 +138,37 @@ class Config:
         else:
             self.samples_per_pixel = output['samples_per_pixel']
 
-        if not 'up_axis' in output:
+        if not 'up_axis' in output and not 'camera_axis' in output:
             self.up_axis = [0,0,1]
-        else:
-            self.up_axis = output['up_axis']
-
-        if not 'camera_axis' in output:
             self.camera_axis = [0,1,0]
-        else:
+        elif 'up_axis' in output and'camera_axis' in output:
+            self.up_axis = output['up_axis']
             self.camera_axis = output['camera_axis']
 
+            if np.array_equal(np.abs(self.up_axis), np.abs(self.camera_axis)):
+                raise SystemExit(Fore.RED + "ERROR: Invalid combination of 'up_axis' and 'camera_axis'." + Style.RESET_ALL)
+        else:
+            raise SystemExit(Fore.RED + "ERROR: 'up_axis' and 'camera_axis' must either both be provided or both be omitted for automatic defaults." + Style.RESET_ALL)
+        
         if not 'rotation_axis' in output:
-            self.rotation_axis = [0,0,1]
+            self.rotation_axis = [0,0,0]
         else:
             self.rotation_axis = output['rotation_axis']
 
         if not 'x_rotation_degrees' in output:
-            self.x_rotation_degrees = 0
+            self.camera_x_rotation_degrees = 0
         else:
-            self.x_rotation_degrees = output['x_rotation_degrees'] 
+            self.camera_x_rotation_degrees = output['x_rotation_degrees'] 
 
         if not 'y_rotation_degrees' in output:
-            self.y_rotation_degrees = 0
+            self.camera_y_rotation_degrees = 0
         else:
-            self.y_rotation_degrees = output['y_rotation_degrees'] 
+            self.camera_y_rotation_degrees = output['y_rotation_degrees'] 
 
         if not 'z_rotation_degrees' in output:
-            self.z_rotation_degrees = 0
+            self.camera_z_rotation_degrees = 0
         else:
-            self.z_rotation_degrees = output['z_rotation_degrees'] 
+            self.camera_z_rotation_degrees = output['z_rotation_degrees'] 
 
 
         if not 'add_floor' in output:
@@ -226,7 +229,7 @@ class Config:
                 else:
                     n = len(os.listdir(object_config['filename']))
                     print(n)
-                for i in range(1,n):
+                for i in range(1,n+1):
                     object_i_config = copy.deepcopy(object_config)
                     object_i_config['filename'] = object_config['filename'] + str(i).zfill(3) + '.obj'
                     object_i_config['name'] = 'tile_' + str(i)
@@ -318,35 +321,27 @@ class ObjectConfig:
         else:
             self.type = object_config_file['type']
 
-        if not 'rotation_axis' in object_config_file:
-            self.rotation_axis = [1,0,0]
-        else:
-            self.rotation_axis = object_config_file['rotation_axis']
-
-        if not 'rotation_degrees' in object_config_file:
-            self.rotation_degrees = 0
-        else:
-            self.rotation_degrees = object_config_file['rotation_degrees']
-
         if not 'x_rotation_degrees' in object_config_file:
-            self.x_rotation_degrees = 0
+            self.object_x_rotation_degrees = 0
         else:
-            self.x_rotation_degrees = object_config_file['x_rotation_degrees'] 
+            self.object_x_rotation_degrees = object_config_file['x_rotation_degrees'] 
 
         if not 'y_rotation_degrees' in object_config_file:
-            self.y_rotation_degrees = 0
+            self.object_y_rotation_degrees = 0
         else:
-            self.y_rotation_degrees = object_config_file['y_rotation_degrees'] 
+            self.object_y_rotation_degrees = object_config_file['y_rotation_degrees'] 
 
         if not 'z_rotation_degrees' in object_config_file:
-            self.z_rotation_degrees = 0
+            self.object_z_rotation_degrees = 0
         else:
-            self.z_rotation_degrees = object_config_file['z_rotation_degrees'] 
+            self.object_z_rotation_degrees = object_config_file['z_rotation_degrees'] 
 
         if not 'material' in object_config_file:
             raise SystemExit(Fore.RED + "ERROR: Required json object 'material' is missing from object in 'objects" + Style.RESET_ALL)
         else:
             material = object_config_file['material']
+
+        self.material_dict = material
 
         if not 'type' in material:
             self.material_type = "diffuse"

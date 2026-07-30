@@ -31,7 +31,7 @@ def main():
                 results_name = variables.config.results_name
 
             output.AnimationVideo(variables.config.results_folder, "frames" + str(i) + "/", results_name, variables.config.rotation_degrees)
-            video=cv.VideoWriter(variables.config.results_folder + results_name, cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.width))
+            video=cv.VideoWriter(variables.config.results_folder + results_name, cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.height))
             
             folder_path = variables.config.results_folder + "frames" + str(i) + "/"
 
@@ -52,7 +52,7 @@ def main():
                 results_name = variables.config.results_name
 
             output.RotationVideo(variables.config.results_folder, "frames" + str(i) + "/", results_name)
-            video=cv.VideoWriter(variables.config.results_folder + results_name, cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.width))
+            video=cv.VideoWriter(variables.config.results_folder + results_name, cv.VideoWriter_fourcc(*'XVID'), variables.config.fps, (variables.config.width,variables.config.height))
             
             folder_path = variables.config.results_folder + "frames" + str(i) + "/"
 

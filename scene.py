@@ -12,6 +12,7 @@ sys.path.append(parent_dir)
 
 from camera import *
 from object import Object
+from light import Light
 
 if(config.use_gpu):
     mitsuba.set_variant("cuda_ad_rgb")
@@ -77,39 +78,18 @@ class Scene:
     
     def get_lights_from_json(self):
         lights = []
-
-        light_obj : cf.LightConfig
-        for light_obj in config.lights:
-            if light_obj.emitter_type == "area":
-                scale_vector, position, rotation = self.get_lights_position_info(light_obj)
+        lights_info = config.lights
+        for light_info in lights_info:
+            if light_info.emitter_type == "area":
+                scale_vector, position, rotation = self.get_lights_position_info(light_info)
 
                 to_world = T.translate(position).scale(scale_vector) @ rotation
-                light = {'type': light_obj.emitter_shape, 
-                         'to_world':to_world, 
-                         'bsdf': {
-                            'type': 'diffuse',
-                                'reflectance': {
-                                    'type': 'rgb',
-                                    'value': [1,1,1]
-                                }
-                         },
-                         'emitter': {
-                            'type': light_obj.emitter_type, 
-                            'radiance': {
-                                'type': 'rgb', 
-                                'value': light_obj.emitter_radiance
-                            },
-                          }
-                        }
-            elif light_obj.emitter_type == "envmap":
-                light = {'type': 'envmap',
-                         'filename': light_obj.envmap_filename,
-                         'to_world': T.rotate(light_obj.envmap_rotation_axis, light_obj.envmap_rotation_degrees),
-                         'scale': light_obj.envmap_scale_factor
-                        }
-            
-            lights.append(light)
+            else:
+                to_world = None
 
+            light = Light(light_info, to_world)
+            lights.append(light)
+            
         return lights
 
     def find_center_of_bounding_box(self):
@@ -122,7 +102,7 @@ class Scene:
         }
 
         for object in self.objects:
-            my_scene[object.name] = {'type': object.type, 'filename': object.filename}
+            my_scene[object.name] = object.to_geometry_dict()
 
         scene = mitsuba.load_dict(my_scene)    
 
@@ -224,24 +204,12 @@ class Scene:
         }
 
         for object in self.objects:
-            rotation_x = T.rotate(axis=[1, 0, 0], angle=object.x_rotation_degrees)
-            rotation_y = T.rotate(axis=[0, 1, 0], angle=object.y_rotation_degrees)
-            rotation_z = T.rotate(axis=[0, 0, 1], angle=object.z_rotation_degrees)
-
-            combined_rotation = rotation_z @ rotation_y @ rotation_x
-            
-            object_dict = {
-                'type': object.type,
-                'filename': object.filename,
-                'bsdf': object.material,
-                'to_world': combined_rotation
-            }
-            my_scene[object.name] = object_dict
+            my_scene[object.name] = object.to_mitsuba_dict()
 
         light_index=0
         for light in self.lights:
             light_index += 1
-            my_scene['light'+str(light_index)] = light
+            my_scene['light'+str(light_index)] = light.to_mitsuba_dict()
 
         if(self.constant_radiance != 0):
             constant_lighting = {
@@ -292,11 +260,11 @@ class Scene:
             my_scene['floor'] = floor
 
         if(config.add_background):
-            rotation_axis, rotation_angle, floor_center = self.get_background_position_info()
+            rotation_axis, rotation_angle, background_center = self.get_background_position_info()
 
             floor = {
                 'type': 'rectangle',
-                'to_world': T.translate(floor_center).rotate(rotation_axis,rotation_angle).scale([max(self.sizes)*background_scale_multiplier,max(self.sizes)*background_scale_multiplier,max(self.sizes)*background_scale_multiplier])
+                'to_world': T.translate(background_center).rotate(rotation_axis,rotation_angle).scale([max(self.sizes)*background_scale_multiplier,max(self.sizes)*background_scale_multiplier,max(self.sizes)*background_scale_multiplier])
             }
 
             if(config.background_type == "checkerboard"):

@@ -3,16 +3,6 @@ import numpy as np
 import util
 from variables import *
 
-if(config.use_gpu):
-    mitsuba.set_variant("cuda_ad_rgb")
-else:
-    if(config.disable_cpu_parallelization == True):
-        mitsuba.set_variant("scalar_rgb")
-    else:
-        mitsuba.set_variant("llvm_ad_rgb")
-
-from mitsuba import ScalarTransform4f as T
-
 class Camera:
     def __init__(self, fov, distance, camera_target, up_axis = np.array([0,1,0]), width = 512, height = 512, spp = 224, seed=0, rotation_axis = [0,0,0], camera_axis=np.array([0,0,1])):
         self.fov = fov
@@ -128,16 +118,18 @@ class Camera:
         return new_camera_origin
     
     def load_sensor(self, angle=0.0):
+        from mitsuba import ScalarTransform4f as T
+
         transform = T.look_at(origin=self.rotate_camera_origin(angle), target=self.camera_target, up=self.up_axis)
 
         # Rotation around X-axis (30 degrees)
-        rotation_x = T.rotate(axis=[1, 0, 0], angle=config.x_rotation_degrees)
+        rotation_x = T.rotate(axis=[1, 0, 0], angle=config.camera_x_rotation_degrees)
 
         # Rotation around Y-axis (45 degrees)
-        rotation_y = T.rotate(axis=[0, 1, 0], angle=config.y_rotation_degrees)
+        rotation_y = T.rotate(axis=[0, 1, 0], angle=config.camera_y_rotation_degrees)
 
         # Rotation around Z-axis (60 degrees)
-        rotation_z = T.rotate(axis=[0, 0, 1], angle=config.z_rotation_degrees)
+        rotation_z = T.rotate(axis=[0, 0, 1], angle=config.camera_z_rotation_degrees)
 
         combined_rotation = rotation_z @ rotation_y @ rotation_x
 
