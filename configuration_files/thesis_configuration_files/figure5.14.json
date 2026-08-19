@@ -1,0 +1,55 @@
+{
+  "output": {
+    "type": "animation_video",
+    "rotation_axis": [0,1,0],
+    "rotation_degrees": 0,
+    "rotation_step":10,
+    "fov": 45,
+    "target": [50,0,0], 
+    "distance": 195,
+    "up_axis": [0,1,0],
+    "camera_axis": [0,0,1],
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 4032,
+    "add_floor": false,
+    "add_background": false,
+    "results_folder": "D:/andriani/repos/mitsuba3-util-thesis-images-results/",
+    "results_filename": "figure5.14.mp4"
+  },
+  "objects": [
+    {
+      "name": "material",
+      "filename": "animation_files/01_cutting/3d_out/material/",
+      "type":"obj",
+      "material": {
+        "type": "roughmetal"
+      }
+    },
+    {
+      "name": "tool",
+      "filename": "animation_files/01_cutting/3d_out/tool/",
+      "type":"obj",
+      "material": {
+        "type": "roughmetal",
+        "metal_type": "Ag"
+      }
+    },
+    {
+      "name": "scene",
+      "filename": "animation_files/01_cutting/3d_out/scene/floor.obj",
+      "type":"obj",
+      "material": {
+        "type": "plastic"
+      }
+    }
+  ],
+  "lights": [
+    {
+      "name": "light5",
+      "emitter_type": "envmap",
+      "filename": "envmaps/christmas_photo_studio_4k_resized.hdr",
+      "radiance": 100
+    }
+  ]
+}

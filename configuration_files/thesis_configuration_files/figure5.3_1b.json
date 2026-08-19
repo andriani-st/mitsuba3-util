@@ -1,0 +1,33 @@
+{
+  "use_gpu": true,
+  "output": {
+    "type": "image",
+    "fov": 45,
+    "width": 1024,
+    "height": 1024,
+    "samples_per_pixel": 4032,
+    "seed": 0,
+    "add_floor": true,
+    "add_background": false,
+    "results_folder": "D:/andriani/repos/mitsuba3-util-thesis-images-results/",
+    "results_filename": "figure5.3_1b.png"
+  },
+  "objects": [
+    {
+      "filename": "obj_files/cylinder.obj",
+      "type":"obj",
+      "material": {
+        "type": "roughglass",
+        "alpha": 0.06
+      }
+    }
+  ],
+  "lights": [
+    {
+      "name": "light5",
+      "emitter_type": "envmap",
+      "filename": "envmaps/christmas_photo_studio_4k_resized.hdr",
+      "radiance": 100
+    }
+  ]
+}

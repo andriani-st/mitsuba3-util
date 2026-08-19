@@ -1,0 +1,22 @@
+{
+  "use_gpu": true,
+
+  "lights_radiance": 2,
+
+  "output": {
+    "type": "image",
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 5040,
+    "fov": 45,
+    "seed": 0,
+    "results_folder": "D:/andriani/repos/mitsuba3-util-thesis-images-results/",
+    "results_filename": "figure6.2.png"
+  },
+
+  "stained_glass_files": {
+    "tiles_path": "../stained_glass/example_files/1/tiles/",
+    "skeleton_path": "../stained_glass/example_files/1/skeleton.obj",
+    "colors_path": "../stained_glass/example_files/1/colors.txt"
+  }
+}

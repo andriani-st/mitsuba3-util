@@ -4,6 +4,7 @@ import sys
 sys.path.append('../')
 import variables
 import config as cf
+import os
 
 config = sys.argv[1]
 
@@ -381,7 +382,18 @@ def main():
 
     scene = load_scene(light_radiance=variables.config.room_lights_radiance)
     image = mitsuba.render(scene, spp=variables.config.samples_per_pixel, sensor=sensor)
-    mitsuba.util.write_bitmap("result" + ".png", image)
+    
+    # Default filename if none is provided
+    filename = variables.config.results_name if variables.config.results_name else "result.png"
+
+    # If no results folder is given, save in current folder
+    if variables.config.results_folder:
+        os.makedirs(variables.config.results_folder, exist_ok=True)
+        output_path = os.path.join(variables.config.results_folder, filename)
+    else:
+        output_path = filename
+
+    mitsuba.util.write_bitmap(output_path, image)
     
     
 if __name__ == "__main__":

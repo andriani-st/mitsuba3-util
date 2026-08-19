@@ -1,0 +1,35 @@
+{
+  "use_gpu": true,
+  "output": {
+    "type": "rotation_video",
+    "rotation_axis": [0,0,1],
+    "rotation_degrees": 360,
+    "rotation_step":10,
+    "fov": 45,
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 4032,
+    "add_floor": true,
+    "add_background": false,
+    "results_folder": "D:/andriani/repos/mitsuba3-util-thesis-images-results/",
+    "results_filename": "figure5.13.mp4"
+  },
+  "objects": [
+    {
+      "name": "curves",
+      "filename": "obj_files/cylinder.obj",
+      "type":"obj",
+      "material": {
+        "type": "plastic",
+        "color": [0.0, 0.45, 0.5]
+      }
+    }
+  ],
+  "lights": [
+    {
+      "name": "light2",
+      "emitter_type": "envmap",
+      "filename":"envmaps/christmas_photo_studio_4k_resized.hdr"
+    }
+  ]
+}

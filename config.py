@@ -225,7 +225,7 @@ class Config:
                             color_components = [float(component)/255 for component in line.split()]
                             colors.append(color_components)
 
-                    n=len(colors)+1
+                    n=len(colors)
                 else:
                     n = len(os.listdir(object_config['filename']))
                     print(n)

@@ -1,0 +1,39 @@
+{
+  "output": {
+    "type": "image",
+    "fov": 45,
+    "width": 512,
+    "height": 512,
+    "samples_per_pixel": 4032,
+    "add_floor": true,
+    "add_background": false,
+    "results_folder": "D:/andriani/repos/mitsuba3-util-thesis-images-results/",
+    "results_filename": "figure6.5.png"
+  },
+  "objects": [
+    {
+      "name": "curves",
+      "filename": "canning/curves_files/5/curves_twist_1.txt",
+      "type":"linearcurve",
+      "material": {
+        "type": "metal"
+      }
+    },
+    {
+      "name": "curves1",
+      "filename": "canning/curves_files/5/curves_twist_2.txt",
+      "type":"linearcurve",
+      "material": {
+        "type": "glass",
+        "color": [0.047058823529411764, 0.2549019607843137, 0.3764705882352941]
+      }
+    }
+  ],
+  "lights": [
+    {
+      "name": "light2",
+      "emitter_type": "envmap",
+      "filename": "envmaps/christmas_photo_studio_4k_resized.hdr"
+    }
+  ]
+}

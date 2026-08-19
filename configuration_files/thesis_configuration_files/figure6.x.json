@@ -1,0 +1,36 @@
+{
+  "use_gpu": true,
+
+  "output": {
+    "type": "image",
+    "fov": 45,
+    "width": 1024,
+    "height": 1024,
+    "samples_per_pixel": 4032,
+    "seed": 0,
+    "add_floor": true,
+    "add_background": true,
+    "results_folder": "D:/andriani/repos/mitsuba3-util-thesis-images-results/",
+    "results_filename": "figure6.x.png"
+  },
+
+  "objects": [
+    {
+      "filename": "cylinder_orderings/curves_files/curves2.txt",
+      "type": "linearcurve",
+      "material": {
+        "type": "glass"
+      },
+      "x_rotation_degrees": 90
+    }
+  ],
+
+  "lights": [
+    {
+      "name": "light5",
+      "emitter_type": "area",
+      "emitter_shape": "sphere",
+      "radiance": 40
+    }
+  ]
+}
